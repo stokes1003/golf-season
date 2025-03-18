@@ -11,7 +11,7 @@ import {
   Avatar,
 } from "@mantine/core";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 function App() {
   const golfCourses = ["MoWilly", "Lions", "Jimmy Clay", "Roy Kizer"];
@@ -25,6 +25,7 @@ function App() {
     { player: "Stokes", gross: "", hcp: "" },
     { player: "JP", gross: "", hcp: "" },
   ]);
+  const [allScores, setAllScores] = useState([]);
 
   const players = [
     {
@@ -47,17 +48,6 @@ function App() {
     },
   ];
 
-  const rounds = [
-    {
-      course: "MoWilly",
-      date: "2024-10-01",
-      scores: [
-        { player: "Travis", net: 72, gross: 78, hcp: 10 },
-        { player: "Stokes", net: 72, gross: 78, hcp: 10 },
-        { player: "JP", net: 72, gross: 78, hcp: 10 },
-      ],
-    },
-  ];
   const handleSubmitScores = () => {
     if (playerCounter === 2) {
       setPlayerCounter(0);
@@ -82,6 +72,21 @@ function App() {
       setPlayerCounter((prev) => prev + 1);
     }
   };
+  useEffect(() => {
+    const fetchScores = async () => {
+      try {
+        const response = await fetch("/.netlify/functions/getScores");
+        const data = await response.json();
+        const sortedScores = data.sort((a, b) => {
+          return new Date(b.date) - new Date(a.date);
+        });
+        setAllScores(sortedScores);
+      } catch (error) {
+        console.error("Error fetching scores:", error);
+      }
+    };
+    fetchScores();
+  }, []);
 
   const postScores = async (round) => {
     try {
@@ -231,7 +236,7 @@ function App() {
           </Grid.Col>
         </Grid>
         <Divider />
-        {rounds.map((round) =>
+        {allScores.map((round) =>
           round.scores.map((player) => (
             <Stack key={`${round.id}-${player.player}`}>
               <Grid justify="space-between" gutter="xl" align="center">
@@ -251,7 +256,9 @@ function App() {
                   <Text>{player.gross}</Text>
                 </Grid.Col>
                 <Grid.Col span={2} ta="center" w={72}>
-                  <Text>{round.date}</Text>
+                  <Text>
+                    {new Date(round.date).toLocaleDateString("en-US")}
+                  </Text>
                 </Grid.Col>
               </Grid>
               <Divider />
