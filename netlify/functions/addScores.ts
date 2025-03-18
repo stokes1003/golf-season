@@ -3,8 +3,11 @@ import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
 dotenv.config();
 // Replace the uri string with your connection string.
-const uri =
-  "mongodb+srv://stokes1003:5H2ZHmFZYg0dr1sN@cluster0.h3a7bqm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = process.env.MONGO_URI;
+
+if (!uri) {
+  throw new Error("MONGO_URI environment variable is not set");
+}
 
 export const client = new MongoClient(uri);
 

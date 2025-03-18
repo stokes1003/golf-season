@@ -3,9 +3,13 @@ import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
 dotenv.config();
 
-const uri = process.env.MONGO_URI!;
-export const client = new MongoClient(uri);
+const uri = process.env.MONGO_URI;
 
+if (!uri) {
+  throw new Error("MONGO_URI environment variable is not set");
+}
+
+export const client = new MongoClient(uri);
 const myHandler: Handler = async (event, context) => {
   try {
     await client.connect();

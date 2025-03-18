@@ -14,37 +14,41 @@ import {
 import { useState } from "react";
 
 function App() {
-  const [stokesNetWins, setStokesNetWins] = useState(0);
-  const [stokesGrossWins, setStokesGrossWins] = useState(0);
-  const [jpNetWins, setJpNetWins] = useState(0);
-  const [jpGrossWins, setJpGrossWins] = useState(0);
-  const [travisGrossWins, setTravisGrossWins] = useState(0);
-  const [travisNetWins, setTravisNetWins] = useState(0);
+  const golfCourses = ["MoWilly", "Lions", "Jimmy Clay", "Roy Kizer"];
+  const [golfCourse, setGolfCourse] = useState("golfcourses");
+  const [isScore, setIsScore] = useState(false);
+  const [isGolfCourse, setIsGolfCourse] = useState(false);
+  const [isAddScore, setIsAddScore] = useState(true);
+  const [playerCounter, setPlayerCounter] = useState(0);
+  const [playerScores, setPlayerScores] = useState([
+    { player: "Travis", gross: "", hcp: "" },
+    { player: "Stokes", gross: "", hcp: "" },
+    { player: "JP", gross: "", hcp: "" },
+  ]);
 
   const players = [
     {
       name: "Travis",
       image: "TV",
-      netWins: travisNetWins,
-      grossWins: travisGrossWins,
+      netWins: 2,
+      grossWins: 1,
     },
     {
       name: "Stokes",
       image: "SS",
-      netWins: stokesNetWins,
-      grossWins: stokesGrossWins,
+      netWins: 3,
+      grossWins: 2,
     },
     {
       name: "JP",
       image: "JP",
-      netWins: jpNetWins,
-      grossWins: jpGrossWins,
+      netWins: 1,
+      grossWins: 2,
     },
   ];
 
   const rounds = [
     {
-      id: 0,
       course: "MoWilly",
       date: "2024-10-01",
       scores: [
@@ -54,31 +58,43 @@ function App() {
       ],
     },
   ];
-
-  const postScores = () => {
-    fetch("/.netlify/functions/addScore", {
-      method: "Post",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+  const handleSubmitScores = () => {
+    if (playerCounter === 2) {
+      setPlayerCounter(0);
+      postScores({
         course: golfCourse,
         date: new Date().toISOString(),
-      }),
-    })
-      .then((response) => response.json())
-      .then((data) => console.log("success", data))
-      .catch((error) => {
-        console.error("Error posting scores:", error);
+        scores: playerScores.map((player) => ({
+          player: player.player,
+          gross: parseInt(player.gross, 10),
+          hcp: parseInt(player.hcp, 10),
+          net: parseInt(player.gross, 10) - parseInt(player.hcp, 10),
+        })),
       });
+
+      setIsAddScore((prev) => !prev);
+      setIsScore((prev) => !prev);
+    } else {
+      setPlayerCounter((prev) => prev + 1);
+    }
   };
 
-  const golfCourses = ["MoWilly", "Lions", "Jimmy Clay", "Roy Kizer"];
-  const [golfCourse, setGolfCourse] = useState("golfcourses");
-  const [isScore, setIsScore] = useState(false);
-  const [isGolfCourse, setIsGolfCourse] = useState(false);
-  const [isAddScore, setIsAddScore] = useState(true);
-  const [playerCounter, setPlayerCounter] = useState(0);
+  const postScores = async (round) => {
+    try {
+      const response = await fetch("/.netlify/functions/addScores", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(round),
+      });
+
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error("Error submitting scores:", error);
+    }
+  };
 
   return (
     <Stack my="md" align="center" justify="center" gap="xl">
@@ -117,25 +133,26 @@ function App() {
               <Input
                 placeholder={`${players[playerCounter].name}'s HCP`}
                 w={150}
+                value={playerScores[playerCounter].hcp}
+                onChange={(e) => {
+                  const updatedScores = [...playerScores];
+                  updatedScores[playerCounter].hcp = e.target.value;
+                  setPlayerScores(updatedScores);
+                }}
               />
               <Input
                 placeholder={`${players[playerCounter].name}'s Gross`}
                 w={150}
+                value={playerScores[playerCounter].gross}
+                onChange={(e) => {
+                  const updatedScores = [...playerScores];
+                  updatedScores[playerCounter].gross = e.target.value;
+                  setPlayerScores(updatedScores);
+                }}
               />
             </Stack>
           </Group>
-          <Button
-            w={150}
-            onClick={() => {
-              if (playerCounter === 2) {
-                setPlayerCounter(0);
-                postScores();
-                setIsAddScore((prev) => !prev);
-                setIsScore((prev) => !prev);
-              }
-              setPlayerCounter((prev) => prev + 1);
-            }}
-          >
+          <Button w={150} onClick={handleSubmitScores}>
             {playerCounter === 2 ? "Submit Scores" : "Next Player"}
           </Button>
         </Stack>
