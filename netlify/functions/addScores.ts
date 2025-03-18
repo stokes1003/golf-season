@@ -2,13 +2,8 @@ import { Handler } from "@netlify/functions";
 import { MongoClient } from "mongodb";
 import dotenv from "dotenv";
 dotenv.config();
-// Replace the uri string with your connection string.
-const uri = process.env.MONGO_URI;
 
-if (!uri) {
-  throw new Error("MONGO_URI environment variable is not set");
-}
-
+const uri = process.env.MONGO_URI!;
 export const client = new MongoClient(uri);
 
 const handler: Handler = async (event) => {
