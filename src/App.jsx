@@ -63,7 +63,11 @@ function App() {
       setPlayerCounter(0);
       postScores({
         course: golfCourse,
-        date: new Date().toISOString(),
+        date: new Date().toLocaleDateString("en-US", {
+          month: "2-digit",
+          day: "2-digit",
+          year: "numeric",
+        }),
         scores: playerScores.map((player) => ({
           player: player.player,
           gross: parseInt(player.gross, 10),
