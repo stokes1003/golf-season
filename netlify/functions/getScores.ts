@@ -1,29 +1,34 @@
+import { builder, Handler } from "@netlify/functions";
 import { MongoClient } from "mongodb";
+import dotenv from "dotenv";
+dotenv.config();
 
-const MONGODB_URI =
-  "mongodb+srv://stokes1003:%KjBh4Az@Vq1YCf&@cluster0.h3a7bqm.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = process.env.MONGO_URI!;
+export const client = new MongoClient(uri);
 
-const client = new MongoClient(process.env.MONGODB_URI);
-
-export default async function handler(event, context) {
+const myHandler: Handler = async (event, context) => {
   try {
     await client.connect();
-    const db = client.db("fairway-fleas");
-    const collection = db.collection("scores");
-
-    const data = await collection.find({}).toArray();
-
+    const movies = await client
+      .db("fairway-fleas")
+      .collection("scores")
+      .find({})
+      .toArray();
     return {
       statusCode: 200,
-      body: JSON.stringify(data),
+      body: JSON.stringify(movies),
     };
   } catch (error) {
     console.error(error);
     return {
-      statusCode: 500,
-      body: JSON.stringify({ error: "Failed to fetch data" }),
+      statusCode: 200,
+      body: JSON.stringify({
+        message: "Error connecting to db",
+      }),
     };
-  } finally {
-    await client.close();
   }
-}
+};
+
+const handler = builder(myHandler);
+
+export { handler };
