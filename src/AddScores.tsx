@@ -1,8 +1,9 @@
 import { Button, Group, Input, Select, Stack, Text } from "@mantine/core";
 import React, { useState, useEffect } from "react";
 
-export const AddScores = ({ players, setPlayers, allScores, setAllScores }) => {
+export const AddScores = ({ players, setPlayers, setAllScores }) => {
   const golfCourses = ["MoWilly", "Lions", "Jimmy Clay", "Roy Kizer"];
+  const [refreshScores, setRefreshScores] = useState(false);
   const [golfCourse, setGolfCourse] = useState<string | null>(null);
   const [isScore, setIsScore] = useState(false);
   const [isGolfCourse, setIsGolfCourse] = useState(false);
@@ -41,7 +42,7 @@ export const AddScores = ({ players, setPlayers, allScores, setAllScores }) => {
       }
     };
     fetchScores();
-  }, [allScores.length]);
+  }, [refreshScores]);
 
   const handleSubmitScores = () => {
     if (playerCounter === 2) {
@@ -49,6 +50,14 @@ export const AddScores = ({ players, setPlayers, allScores, setAllScores }) => {
       postScores({
         course: golfCourse,
         date: new Date(),
+        scores: playerScores.map((player) => ({
+          player: player.player,
+          gross: parseInt(player.gross, 10),
+          hcp: parseInt(player.hcp, 10),
+          net: parseInt(player.gross, 10) - parseInt(player.hcp, 10),
+        })),
+      });
+      updateWinners({
         scores: playerScores.map((player) => ({
           player: player.player,
           gross: parseInt(player.gross, 10),
@@ -64,6 +73,34 @@ export const AddScores = ({ players, setPlayers, allScores, setAllScores }) => {
     }
   };
 
+  const updateWinners = async (round) => {
+    const netWinner = round.scores.reduce((prev, current) =>
+      prev.net > current.net ? prev : current
+    );
+    console.log(netWinner.player);
+    const grossWinner = round.scores.reduce((prev, current) =>
+      prev.gross > current.gross ? prev : current
+    );
+    console.log(grossWinner.player);
+
+    try {
+      const response = await fetch("/.netlify/functions/updatePlayerWins", {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          netWinner: netWinner.player,
+          grossWinner: grossWinner.player,
+        }),
+      });
+      const data = await response.json();
+      console.log(data);
+    } catch (error) {
+      console.error("Error updating winners:", error);
+    }
+  };
+
   const postScores = async (round) => {
     try {
       const response = await fetch("/.netlify/functions/addScores", {
@@ -73,13 +110,16 @@ export const AddScores = ({ players, setPlayers, allScores, setAllScores }) => {
         },
         body: JSON.stringify(round),
       });
-
       const data = await response.json();
-      console.log(data);
+
+      if (data) {
+        setRefreshScores((prev) => !prev);
+      }
     } catch (error) {
       console.error("Error submitting scores:", error);
     }
   };
+
   return (
     <Stack>
       {isGolfCourse && (
