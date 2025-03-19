@@ -26,7 +26,7 @@ export const AddScores = ({ players, setPlayers, setAllScores }) => {
       }
     };
     fetchPlayers();
-  }, []);
+  }, [refreshScores]);
 
   useEffect(() => {
     const fetchScores = async () => {
@@ -45,6 +45,23 @@ export const AddScores = ({ players, setPlayers, setAllScores }) => {
   }, [refreshScores]);
 
   const handleSubmitScores = () => {
+    const gross = parseInt(playerScores[playerCounter].gross, 10);
+    const handicap = parseInt(playerScores[playerCounter].hcp, 10);
+
+    if (
+      isNaN(gross) ||
+      isNaN(handicap) ||
+      gross < 50 ||
+      gross > 150 ||
+      handicap < 0 ||
+      handicap > 36
+    ) {
+      alert(
+        "Invalid scores! Gross should be between 50-150, Handicap should be between 0-36."
+      );
+      return;
+    }
+
     if (playerCounter === 2) {
       setPlayerCounter(0);
       postScores({
@@ -77,11 +94,10 @@ export const AddScores = ({ players, setPlayers, setAllScores }) => {
     const netWinner = round.scores.reduce((prev, current) =>
       prev.net > current.net ? prev : current
     );
-    console.log(netWinner.player);
+
     const grossWinner = round.scores.reduce((prev, current) =>
       prev.gross > current.gross ? prev : current
     );
-    console.log(grossWinner.player);
 
     try {
       const response = await fetch("/.netlify/functions/updatePlayerWins", {
@@ -136,11 +152,25 @@ export const AddScores = ({ players, setPlayers, setAllScores }) => {
           <Button
             w={150}
             onClick={() => {
-              setIsScore((prev) => !prev);
-              setIsGolfCourse((prev) => !prev);
+              if (golfCourse === null) {
+                alert("Please select a golf course");
+              } else {
+                setIsScore((prev) => !prev);
+                setIsGolfCourse((prev) => !prev);
+              }
             }}
           >
             Submit Course
+          </Button>
+          <Button
+            w={150}
+            variant="outline"
+            onClick={() => {
+              setIsGolfCourse((prev) => !prev);
+              setIsAddScore((prev) => !prev);
+            }}
+          >
+            Cancel
           </Button>
         </Stack>
       )}
@@ -174,6 +204,18 @@ export const AddScores = ({ players, setPlayers, setAllScores }) => {
           </Group>
           <Button w={150} onClick={handleSubmitScores}>
             {playerCounter === 2 ? "Submit Scores" : "Next Player"}
+          </Button>
+          <Button
+            w={150}
+            variant="outline"
+            onClick={() => {
+              if (playerCounter === 0) {
+                setIsScore((prev) => !prev);
+                setIsGolfCourse((prev) => !prev);
+              } else setPlayerCounter((prev) => prev - 1);
+            }}
+          >
+            Back
           </Button>
         </Stack>
       )}

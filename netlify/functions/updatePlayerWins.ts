@@ -22,8 +22,9 @@ const handler: Handler = async (event) => {
     const db = client.db("fairway-fleas");
     const playersCollection = db.collection("players");
 
-    await playersCollection.updateOne(
+    await playersCollection.findOneAndUpdate(
       { player: scores.grossWinner },
+
       { $inc: { grossWins: 1 } }
     );
 
@@ -37,7 +38,7 @@ const handler: Handler = async (event) => {
   } catch (error) {
     console.error(error);
     return {
-      statusCode: 500, // Use 500 for server errors
+      statusCode: 500,
       body: JSON.stringify({ message: "Error connecting to db" }),
     };
   }
