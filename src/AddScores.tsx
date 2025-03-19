@@ -41,7 +41,7 @@ export const AddScores = ({ players, setPlayers, allScores, setAllScores }) => {
       }
     };
     fetchScores();
-  }, [allScores]);
+  }, [allScores.length]);
 
   const handleSubmitScores = () => {
     if (playerCounter === 2) {
