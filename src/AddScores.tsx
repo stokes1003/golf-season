@@ -1,8 +1,14 @@
 import { Button, Group, Input, Select, Stack, Text } from "@mantine/core";
 import React, { useState, useEffect } from "react";
 
+type GolfCourse = {
+  courseName: string;
+  par: string;
+  location: string;
+};
+
 export const AddScores = ({ players, setPlayers, setAllScores }) => {
-  const golfCourses = ["MoWilly", "Lions", "Jimmy Clay", "Roy Kizer"];
+  const [golfCourses, setGolfCourses] = useState<GolfCourse[]>([]);
   const [refreshScores, setRefreshScores] = useState(false);
   const [golfCourse, setGolfCourse] = useState<string | null>(null);
   const [isScore, setIsScore] = useState(false);
@@ -14,6 +20,20 @@ export const AddScores = ({ players, setPlayers, setAllScores }) => {
     { player: "Stokes", gross: "", hcp: "" },
     { player: "JP", gross: "", hcp: "" },
   ]);
+
+  useEffect(() => {
+    const fetchGolfCourses = async () => {
+      try {
+        const response = await fetch("/.netlify/functions/getGolfCourses");
+        const data = await response.json();
+        setGolfCourses(data);
+      } catch (error) {
+        console.error("Error fetching golf courses:", error);
+      }
+    };
+    fetchGolfCourses();
+  }, []);
+
   useEffect(() => {
     const fetchPlayers = async () => {
       try {
@@ -143,7 +163,10 @@ export const AddScores = ({ players, setPlayers, setAllScores }) => {
           <Stack gap="xs">
             <Text fw={600}> Select Golf Course</Text>
             <Select
-              data={golfCourses}
+              data={golfCourses.map((course) => ({
+                value: course.courseName,
+                label: course.courseName,
+              }))}
               value={golfCourse}
               onChange={setGolfCourse}
             />
