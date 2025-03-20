@@ -1,15 +1,12 @@
 import { Button, Group, Input, Select, Stack, Text } from "@mantine/core";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
+import { useGetGolfCourses } from "../hooks";
+import { useGetPlayers } from "../hooks";
 
-type GolfCourse = {
-  courseName: string;
-  par: string;
-  location: string;
-};
-
-export const AddScores = ({ players, setPlayers, setAllScores }) => {
-  const [golfCourses, setGolfCourses] = useState<GolfCourse[]>([]);
+export const AddScores = () => {
+  const golfCourses = useGetGolfCourses();
   const [refreshScores, setRefreshScores] = useState(false);
+  const golfers = useGetPlayers(refreshScores);
   const [golfCourse, setGolfCourse] = useState<string | null>(null);
   const [isScore, setIsScore] = useState(false);
   const [isGolfCourse, setIsGolfCourse] = useState(false);
@@ -20,49 +17,6 @@ export const AddScores = ({ players, setPlayers, setAllScores }) => {
     { player: "Stokes", gross: "", hcp: "" },
     { player: "JP", gross: "", hcp: "" },
   ]);
-
-  useEffect(() => {
-    const fetchGolfCourses = async () => {
-      try {
-        const response = await fetch("/.netlify/functions/getGolfCourses");
-        const data = await response.json();
-        setGolfCourses(data);
-      } catch (error) {
-        console.error("Error fetching golf courses:", error);
-      }
-    };
-    fetchGolfCourses();
-  }, []);
-
-  useEffect(() => {
-    const fetchPlayers = async () => {
-      try {
-        const response = await fetch("/.netlify/functions/getPlayers");
-        const data = await response.json();
-        setPlayers(data);
-        console.log(data);
-      } catch (error) {
-        console.error("Error fetching players:", error);
-      }
-    };
-    fetchPlayers();
-  }, [refreshScores]);
-
-  useEffect(() => {
-    const fetchScores = async () => {
-      try {
-        const response = await fetch("/.netlify/functions/getScores");
-        const data = await response.json();
-        const sortedScores = data.sort((a, b) => {
-          return new Date(b.date).getTime() - new Date(a.date).getTime();
-        });
-        setAllScores(sortedScores);
-      } catch (error) {
-        console.error("Error fetching scores:", error);
-      }
-    };
-    fetchScores();
-  }, [refreshScores]);
 
   const handleSubmitScores = () => {
     const gross = parseInt(playerScores[playerCounter].gross, 10);
@@ -131,7 +85,6 @@ export const AddScores = ({ players, setPlayers, setAllScores }) => {
         }),
       });
       const data = await response.json();
-      console.log(data);
     } catch (error) {
       console.error("Error updating winners:", error);
     }
@@ -201,10 +154,10 @@ export const AddScores = ({ players, setPlayers, setAllScores }) => {
       {isScore && (
         <Stack align="center">
           <Group>
-            <Stack key={players[playerCounter].player} align="center" gap="xs">
-              <Text fw={700}>{players[playerCounter].player}</Text>
+            <Stack key={golfers[playerCounter].player} align="center" gap="xs">
+              <Text fw={700}>{golfers[playerCounter].player}</Text>
               <Input
-                placeholder={`${players[playerCounter].player}'s HCP`}
+                placeholder={`${golfers[playerCounter].player}'s HCP`}
                 w={150}
                 value={playerScores[playerCounter].hcp}
                 onChange={(e) => {
@@ -214,7 +167,7 @@ export const AddScores = ({ players, setPlayers, setAllScores }) => {
                 }}
               />
               <Input
-                placeholder={`${players[playerCounter].player}'s Gross`}
+                placeholder={`${golfers[playerCounter].player}'s Gross`}
                 w={150}
                 value={playerScores[playerCounter].gross}
                 onChange={(e) => {
