@@ -4,6 +4,7 @@ type GolfCourse = {
   courseName: string;
   par: string;
   location: string;
+  id: string;
 };
 export type AllScores = {
   course: string;
@@ -20,6 +21,7 @@ export type Player = {
   netWins: number;
   grossWins: number;
   img: string;
+  id: string;
 };
 
 export type PlayerProps = {
