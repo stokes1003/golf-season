@@ -1,27 +1,28 @@
-import { Stack, Text, Card, Group, Avatar, Center } from "@mantine/core";
+import { Stack, Text, Card, Group, Avatar, Image } from "@mantine/core";
 import React from "react";
 import { useGetScores } from "../hooks";
 import { useGetPlayers } from "../hooks";
+import { useGetGolfCourses } from "../hooks";
 
 export const OfficialRounds = () => {
   const allScores = useGetScores(false);
   const players = useGetPlayers(false);
-
+  const golfCourses = useGetGolfCourses();
   return (
     <Stack gap="lg" align="center">
       <Stack>
         <Text fw={900}>Official Rounds</Text>
       </Stack>
       <Stack gap="lg">
-        {allScores.map((round, index) => (
+        {allScores.map((round) => (
           <Card
-            key={index}
+            key={round.id}
             shadow="lg"
-            py="xl"
+            pt="sm"
+            pb="lg"
             radius="lg"
             withBorder
-            w={400}
-            h={325}
+            w={360}
             style={{
               transition: "transform 0.2s ease-in-out",
               transformOrigin: "center",
@@ -32,6 +33,16 @@ export const OfficialRounds = () => {
             onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
             <Stack align="center">
+              <Stack>
+                <Image
+                  w={328}
+                  h={180}
+                  radius="md"
+                  src={
+                    golfCourses.find((c) => c.courseName === round.course)?.img
+                  }
+                />
+              </Stack>
               <Stack gap="xs" align="center">
                 <Text fw={800}>{round.course}</Text>
                 <Text>{new Date(round.date).toLocaleDateString()}</Text>
@@ -70,8 +81,8 @@ export const OfficialRounds = () => {
                 {round.scores
                   .slice()
                   .sort((a, b) => a.net - b.net)
-                  .map((player, index) => (
-                    <Group key={index} gap={52}>
+                  .map((player) => (
+                    <Group key={player.player} gap={52}>
                       <Avatar
                         src={
                           players.find((p) => p.player === player.player)

@@ -5,9 +5,10 @@ import { AddScores } from "./components/AddScores";
 
 function App() {
   return (
-    <Stack my="md" align="center" justify="center" gap="xl">
-      <Stack>
-        <Title>Fairway Fleas Country Club</Title>
+    <Stack my="xl" align="center" justify="center" gap="xl">
+      <Stack align="center" justify="center" gap="xs">
+        <Title>Fairway Fleas</Title>
+        <Title order={3}>2025 Season</Title>
       </Stack>
       <Leaderboard />
       <AddScores />

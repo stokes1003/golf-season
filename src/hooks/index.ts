@@ -5,6 +5,7 @@ type GolfCourse = {
   par: string;
   location: string;
   id: string;
+  img: string;
 };
 export type AllScores = {
   course: string;

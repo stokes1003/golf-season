@@ -1,4 +1,12 @@
-import { Button, Group, Input, Select, Stack, Text } from "@mantine/core";
+import {
+  Button,
+  Group,
+  Input,
+  Select,
+  Stack,
+  Text,
+  Avatar,
+} from "@mantine/core";
 import React, { useState } from "react";
 import { useGetGolfCourses } from "../hooks";
 import { useGetPlayers } from "../hooks";
@@ -155,7 +163,11 @@ export const AddScores = () => {
         <Stack align="center">
           <Group>
             <Stack key={golfers[playerCounter].player} align="center" gap="xs">
-              <Text fw={700}>{golfers[playerCounter].player}</Text>
+              <Group gap="xs">
+                <Avatar src={golfers[playerCounter].img} size="sm" />
+                <Text fw={700}>{golfers[playerCounter].player}</Text>
+              </Group>
+
               <Input
                 placeholder={`${golfers[playerCounter].player}'s HCP`}
                 w={150}
