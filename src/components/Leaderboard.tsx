@@ -132,7 +132,7 @@ export const Leaderboard = () => {
               ))}
           </Group>
         ) : (
-          <Stack>
+          <Stack align="center" justify="center">
             {players
               .sort((a, b) => b.netWins - a.netWins)
               .map((player, index) => (
@@ -142,7 +142,7 @@ export const Leaderboard = () => {
                   radius="lg"
                   withBorder
                   w={260}
-                  h={240}
+                  h={280}
                   key={player.player}
                   style={{
                     boxShadow:
@@ -200,6 +200,19 @@ export const Leaderboard = () => {
                           GWins
                         </Text>
                         <Text>{player.grossWins}</Text>
+                      </Group>
+                      <Group
+                        key={`netAvg-${player.player}`}
+                        justify="space-between"
+                        gap={52}
+                      >
+                        <Text fw={600} w={48}>
+                          NAvg:
+                        </Text>
+                        <Text>
+                          {netAvg().find((avg) => avg.player === player.player)
+                            ?.avg ?? "N/A"}
+                        </Text>
                       </Group>
                     </Stack>
                   </Stack>
