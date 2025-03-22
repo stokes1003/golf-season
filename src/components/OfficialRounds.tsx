@@ -5,8 +5,8 @@ import { useGetPlayers } from "../hooks";
 import { useGetGolfCourses } from "../hooks";
 
 export const OfficialRounds = () => {
-  const allScores = useGetScores(false);
-  const players = useGetPlayers(false);
+  const allScores = useGetScores(0);
+  const players = useGetPlayers(0);
   const golfCourses = useGetGolfCourses();
   return (
     <Stack gap="lg" align="center">

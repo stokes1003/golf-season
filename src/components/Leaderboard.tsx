@@ -1,6 +1,6 @@
 import { Avatar, Stack, Text, Card, Group, Box } from "@mantine/core";
 import React from "react";
-import { useGetPlayers } from "../hooks";
+import { useGetPlayers, useGetScores } from "../hooks";
 import { useMediaQuery } from "@mantine/hooks";
 import {
   IconCircleNumber1Filled,
@@ -9,8 +9,25 @@ import {
 } from "@tabler/icons-react";
 
 export const Leaderboard = () => {
-  const players = useGetPlayers(false);
+  const players = useGetPlayers(0);
+  const scores = useGetScores(0);
   const isMobile = useMediaQuery("(max-width: 700px)");
+
+  const netAvg = () => {
+    if (!scores || scores.length === 0) return [];
+    return scores[0]?.scores?.map((_, index) => {
+      const total = scores.reduce(
+        (sum, score) =>
+          score.scores[index] ? sum + score.scores[index].net : sum,
+        0
+      );
+      const avg = total / scores.length;
+      return {
+        player: scores[0].scores[index].player,
+        avg: parseFloat(avg.toFixed(1)),
+      };
+    });
+  };
 
   return (
     <Stack gap="lg" justify="space-evenly">
@@ -19,7 +36,7 @@ export const Leaderboard = () => {
       </Stack>
       <Stack>
         {!isMobile ? (
-          <Group gap="lg">
+          <Group gap="lg" style={{ alignItems: "self-end" }}>
             {players
               .sort((a, b) => b.netWins - a.netWins)
               .map((player, index) => (
@@ -29,7 +46,15 @@ export const Leaderboard = () => {
                   radius="lg"
                   withBorder
                   w={200}
-                  h={240}
+                  h={
+                    index === 0
+                      ? 280
+                      : index === 1
+                      ? 260
+                      : index === 2
+                      ? 240
+                      : 180
+                  }
                   key={player.player}
                   style={{
                     boxShadow:
@@ -67,14 +92,14 @@ export const Leaderboard = () => {
                       <Avatar size="lg" src={player.img} />
                       <Text fw={800}>{player.player}</Text>
                     </Stack>
-                    <Stack>
+                    <Stack gap="sm">
                       <Group
                         key={`netWins-${player.player}`}
                         justify="space-between"
                         gap={52}
                       >
                         <Text fw={600} w={48}>
-                          NWins
+                          NWins:
                         </Text>
                         <Text>{player.netWins}</Text>
                       </Group>
@@ -84,9 +109,22 @@ export const Leaderboard = () => {
                         gap={52}
                       >
                         <Text fw={600} w={48}>
-                          GWins
+                          GWins:
                         </Text>
                         <Text>{player.grossWins}</Text>
+                      </Group>
+                      <Group
+                        key={`netAvg-${player.player}`}
+                        justify="space-between"
+                        gap={52}
+                      >
+                        <Text fw={600} w={48}>
+                          NAvg:
+                        </Text>
+                        <Text>
+                          {netAvg().find((avg) => avg.player === player.player)
+                            ?.avg ?? "N/A"}
+                        </Text>
                       </Group>
                     </Stack>
                   </Stack>
@@ -95,7 +133,6 @@ export const Leaderboard = () => {
           </Group>
         ) : (
           <Stack>
-            {" "}
             {players
               .sort((a, b) => b.netWins - a.netWins)
               .map((player, index) => (

@@ -8,16 +8,23 @@ import {
   Avatar,
 } from "@mantine/core";
 import React, { useState } from "react";
-import { useGetGolfCourses } from "../hooks";
-import { useGetPlayers } from "../hooks";
+import {
+  useGetGolfCourses,
+  useGetPlayers,
+  usePostScores,
+  useUpdateWinners,
+} from "../hooks";
 
 export const AddScores = () => {
+  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
   const golfCourses = useGetGolfCourses();
-  const [refreshScores, setRefreshScores] = useState(false);
-  const golfers = useGetPlayers(refreshScores);
   const [golfCourse, setGolfCourse] = useState<string | null>(null);
   const [isScore, setIsScore] = useState(false);
   const [isGolfCourse, setIsGolfCourse] = useState(false);
+  const updateWinners = useUpdateWinners(setRefreshTrigger);
+
+  const postScores = usePostScores(setRefreshTrigger);
+  const golfers = useGetPlayers(refreshTrigger);
   const [isAddScore, setIsAddScore] = useState(true);
   const [playerCounter, setPlayerCounter] = useState(0);
   const [playerScores, setPlayerScores] = useState([
@@ -47,7 +54,7 @@ export const AddScores = () => {
     if (playerCounter === 2) {
       setPlayerCounter(0);
       postScores({
-        course: golfCourse,
+        course: golfCourse!,
         date: new Date(),
         scores: playerScores.map((player) => ({
           player: player.player,
@@ -69,51 +76,6 @@ export const AddScores = () => {
       setIsScore((prev) => !prev);
     } else {
       setPlayerCounter((prev) => prev + 1);
-    }
-  };
-
-  const updateWinners = async (round) => {
-    const netWinner = round.scores.reduce((prev, current) =>
-      prev.net > current.net ? prev : current
-    );
-
-    const grossWinner = round.scores.reduce((prev, current) =>
-      prev.gross > current.gross ? prev : current
-    );
-
-    try {
-      const response = await fetch("/.netlify/functions/updatePlayerWins", {
-        method: "PATCH",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          netWinner: netWinner.player,
-          grossWinner: grossWinner.player,
-        }),
-      });
-      const data = await response.json();
-    } catch (error) {
-      console.error("Error updating winners:", error);
-    }
-  };
-
-  const postScores = async (round) => {
-    try {
-      const response = await fetch("/.netlify/functions/addScores", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(round),
-      });
-      const data = await response.json();
-
-      if (data) {
-        setRefreshScores((prev) => !prev);
-      }
-    } catch (error) {
-      console.error("Error submitting scores:", error);
     }
   };
 
