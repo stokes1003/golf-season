@@ -1,17 +1,18 @@
 import { useEffect, useState } from "react";
+import { ObjectId } from "mongodb";
 
 type GolfCourse = {
   courseName: string;
   par: string;
   location: string;
-  id: string;
+  _id: ObjectId;
   img: string;
 };
 export type AllScores = {
   course: string;
   date: string;
   scores: { player: string; gross: number; hcp: number; net: number }[];
-  id: string;
+  _id: ObjectId;
 };
 
 export type Player = {
@@ -19,7 +20,7 @@ export type Player = {
   netWins: number;
   grossWins: number;
   img: string;
-  id: string;
+  _id: ObjectId;
 };
 
 export type Round = {
@@ -28,11 +29,7 @@ export type Round = {
   scores: { player: string; gross: number; hcp: number; net: number }[];
 };
 
-export function usePostScores(
-  setRefreshTrigger: React.Dispatch<React.SetStateAction<number>>
-) {
-  const updateWinners = useUpdateWinners(setRefreshTrigger);
-
+export function usePostScores() {
   const postScores = async (round: Round) => {
     try {
       const response = await fetch("/.netlify/functions/addScores", {
@@ -50,9 +47,6 @@ export function usePostScores(
 
       const data = await response.json();
       console.log("Scores submitted successfully:", data);
-
-      updateWinners(round);
-      setRefreshTrigger((prev) => prev + 1);
     } catch (error) {
       console.error("Error submitting scores:", error);
     }
@@ -80,7 +74,7 @@ export function useGetGolfCourses() {
   return golfCourses;
 }
 
-export function useGetPlayers(refreshTrigger: number) {
+export function useGetPlayers() {
   const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
@@ -94,14 +88,13 @@ export function useGetPlayers(refreshTrigger: number) {
       }
     };
     fetchPlayers();
-  }, [refreshTrigger]);
+  }, []);
 
   return players;
 }
 
-export function useGetScores(refreshTrigger: number): AllScores[] {
+export function useGetScores() {
   const [allScores, setAllScores] = useState<AllScores[]>([]);
-
   useEffect(() => {
     const fetchScores = async () => {
       try {
@@ -116,14 +109,12 @@ export function useGetScores(refreshTrigger: number): AllScores[] {
       }
     };
     fetchScores();
-  }, [refreshTrigger]);
+  }, []);
 
   return allScores;
 }
 
-export function useUpdateWinners(
-  setRefreshTrigger: React.Dispatch<React.SetStateAction<number>>
-) {
+export function useUpdateWinners() {
   const updateWinners = async (round) => {
     const netWinner = round.scores.reduce((prev, current) =>
       current.net <= prev.net ? current : prev
@@ -155,8 +146,9 @@ export function useUpdateWinners(
       }
 
       const data = await response.json();
-      console.log("Winners updated successfully:", data);
-      setRefreshTrigger((prev) => prev + 1); //
+      if (data) {
+        console.log("Winners updated successfully:", data);
+      }
     } catch (error) {
       console.error("Error updating winners:", error);
     }

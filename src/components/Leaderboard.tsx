@@ -1,5 +1,5 @@
 import { Avatar, Stack, Text, Card, Group, Box } from "@mantine/core";
-import React from "react";
+import React, { useMemo } from "react";
 import { useGetPlayers, useGetScores } from "../hooks";
 import { useMediaQuery } from "@mantine/hooks";
 import {
@@ -9,8 +9,8 @@ import {
 } from "@tabler/icons-react";
 
 export const Leaderboard = () => {
-  const players = useGetPlayers(0);
-  const scores = useGetScores(0);
+  const players = useGetPlayers();
+  const scores = useGetScores();
   const isMobile = useMediaQuery("(max-width: 700px)");
 
   const netAvg = () => {

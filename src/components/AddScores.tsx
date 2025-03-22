@@ -6,6 +6,7 @@ import {
   Stack,
   Text,
   Avatar,
+  Box,
 } from "@mantine/core";
 import React, { useState } from "react";
 import {
@@ -14,17 +15,16 @@ import {
   usePostScores,
   useUpdateWinners,
 } from "../hooks";
+import { IconX, IconArrowNarrowLeft } from "@tabler/icons-react";
 
 export const AddScores = () => {
-  const [refreshTrigger, setRefreshTrigger] = useState<number>(0);
   const golfCourses = useGetGolfCourses();
   const [golfCourse, setGolfCourse] = useState<string | null>(null);
   const [isScore, setIsScore] = useState(false);
   const [isGolfCourse, setIsGolfCourse] = useState(false);
-  const updateWinners = useUpdateWinners(setRefreshTrigger);
-
-  const postScores = usePostScores(setRefreshTrigger);
-  const golfers = useGetPlayers(refreshTrigger);
+  const updateWinners = useUpdateWinners();
+  const postScores = usePostScores();
+  const golfers = useGetPlayers();
   const [isAddScore, setIsAddScore] = useState(true);
   const [playerCounter, setPlayerCounter] = useState(0);
   const [playerScores, setPlayerScores] = useState([
@@ -80,12 +80,84 @@ export const AddScores = () => {
   };
 
   return (
-    <Stack>
+    <Stack w={210}>
+      {isGolfCourse && (
+        <Stack align="end">
+          <Box
+            h={24}
+            w={24}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.05)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "transparent")
+            }
+            style={{ alignContent: "center" }}
+          >
+            <IconX
+              stroke={1}
+              cursor={"pointer"}
+              onClick={() => {
+                setIsGolfCourse((prev) => !prev);
+                setIsAddScore((prev) => !prev);
+              }}
+            />
+          </Box>
+        </Stack>
+      )}
+      {isScore && (
+        <Group justify="space-between">
+          <Box
+            h={24}
+            w={24}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.05)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "transparent")
+            }
+            style={{ alignContent: "center" }}
+          >
+            <IconArrowNarrowLeft
+              stroke={1}
+              cursor={"pointer"}
+              onClick={() => {
+                if (playerCounter === 0) {
+                  setIsScore((prev) => !prev);
+                  setIsGolfCourse((prev) => !prev);
+                } else setPlayerCounter((prev) => prev - 1);
+              }}
+            />
+          </Box>
+          <Box
+            h={24}
+            w={24}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.backgroundColor = "rgba(0, 0, 0, 0.05)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.backgroundColor = "transparent")
+            }
+            style={{ alignContent: "center" }}
+          >
+            <IconX
+              stroke={1}
+              cursor={"pointer"}
+              onClick={() => {
+                setIsScore((prev) => !prev);
+                setIsAddScore((prev) => !prev);
+              }}
+            />
+          </Box>
+        </Group>
+      )}
+
       {isGolfCourse && (
         <Stack gap="md" align="center">
           <Stack gap="xs">
             <Text fw={600}> Select Golf Course</Text>
             <Select
+              w={200}
               data={golfCourses.map((course) => ({
                 value: course.courseName,
                 label: course.courseName,
@@ -108,16 +180,6 @@ export const AddScores = () => {
           >
             Submit Course
           </Button>
-          <Button
-            w={150}
-            variant="outline"
-            onClick={() => {
-              setIsGolfCourse((prev) => !prev);
-              setIsAddScore((prev) => !prev);
-            }}
-          >
-            Cancel
-          </Button>
         </Stack>
       )}
 
@@ -132,7 +194,7 @@ export const AddScores = () => {
 
               <Input
                 placeholder={`${golfers[playerCounter].player}'s HCP`}
-                w={150}
+                w={200}
                 value={playerScores[playerCounter].hcp}
                 onChange={(e) => {
                   const updatedScores = [...playerScores];
@@ -142,7 +204,7 @@ export const AddScores = () => {
               />
               <Input
                 placeholder={`${golfers[playerCounter].player}'s Gross`}
-                w={150}
+                w={200}
                 value={playerScores[playerCounter].gross}
                 onChange={(e) => {
                   const updatedScores = [...playerScores];
@@ -155,31 +217,21 @@ export const AddScores = () => {
           <Button w={150} onClick={handleSubmitScores}>
             {playerCounter === 2 ? "Submit Scores" : "Next Player"}
           </Button>
-          <Button
-            w={150}
-            variant="outline"
-            onClick={() => {
-              if (playerCounter === 0) {
-                setIsScore((prev) => !prev);
-                setIsGolfCourse((prev) => !prev);
-              } else setPlayerCounter((prev) => prev - 1);
-            }}
-          >
-            Back
-          </Button>
         </Stack>
       )}
 
       {isAddScore && (
-        <Button
-          w={150}
-          onClick={() => {
-            setIsGolfCourse((prev) => !prev);
-            setIsAddScore((prev) => !prev);
-          }}
-        >
-          Add Scores
-        </Button>
+        <Stack align="center">
+          <Button
+            w={150}
+            onClick={() => {
+              setIsGolfCourse((prev) => !prev);
+              setIsAddScore((prev) => !prev);
+            }}
+          >
+            Add Scores
+          </Button>
+        </Stack>
       )}
     </Stack>
   );
