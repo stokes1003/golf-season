@@ -32,7 +32,7 @@ export const Leaderboard = () => {
   return (
     <Stack gap="lg" justify="space-evenly">
       <Stack align="center">
-        <Text fw={900}>2025 Leaderboard</Text>
+        <Text fw={900}>Leaderboard</Text>
       </Stack>
       <Stack>
         {!isMobile ? (
