@@ -12,9 +12,14 @@ import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import React, { useState } from "react";
 import { useGetPlayers, useGetGolfCourses, useGetScores } from "../hooks";
 
-export const OfficialRounds = ({ updateScores, setUpdateScores }) => {
-  const allScores = useGetScores(updateScores);
-  const players = useGetPlayers(updateScores);
+export const OfficialRounds = ({
+  updateScores,
+  setUpdateScores,
+  updatePlayers,
+  setUpdatePlayers,
+}) => {
+  const allScores = useGetScores(setUpdatePlayers, updateScores);
+  const players = useGetPlayers(updatePlayers);
   const golfCourses = useGetGolfCourses();
   const [deleteRoundId, setDeleteRoundId] = useState<string | null>(null);
   const [opened, { open, close }] = useDisclosure(false);

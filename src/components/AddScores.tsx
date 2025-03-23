@@ -23,6 +23,8 @@ export const AddScores = ({
   setIsLeaderboard,
   updateScores,
   setUpdateScores,
+  updatePlayers,
+  setUpdatePlayers,
 }) => {
   const golfCourses = useGetGolfCourses();
   const [golfCourse, setGolfCourse] = useState<string | null>(null);
@@ -30,8 +32,8 @@ export const AddScores = ({
   const [isGolfCourse, setIsGolfCourse] = useState(true);
   const updateWinners = useUpdateWinners();
   const postScores = usePostScores();
-  const golfers = useGetPlayers(updateScores);
-  const scores = useGetScores(updateScores);
+  const golfers = useGetPlayers(updatePlayers);
+  const scores = useGetScores(setUpdatePlayers, updateScores);
   const [isAddScore, setIsAddScore] = useState(true);
   const [playerCounter, setPlayerCounter] = useState(0);
 

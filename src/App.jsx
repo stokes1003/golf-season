@@ -8,15 +8,22 @@ import { useState } from "react";
 function App() {
   const [isLeaderboard, setIsLeaderboard] = useState(true);
   const [updateScores, setUpdateScores] = useState(0);
+  const [updatePlayers, setUpdatePlayers] = useState(0);
   return (
     <Stack mb="xl" align="center" gap="xl">
       <HeaderMenu setIsLeaderboard={setIsLeaderboard} />
       {isLeaderboard ? (
         <Stack gap="xl">
-          <Leaderboard updateSores={updateScores} />
+          <Leaderboard
+            updateScores={updateScores}
+            updatePlayers={updatePlayers}
+            setUpdatePlayers={setUpdatePlayers}
+          />
           <OfficialRounds
             updateScores={updateScores}
             setUpdateScores={setUpdateScores}
+            setUpdatePlayers={setUpdatePlayers}
+            updatePlayers={updatePlayers}
           />
         </Stack>
       ) : (
@@ -24,6 +31,8 @@ function App() {
           setIsLeaderboard={setIsLeaderboard}
           updateScores={updateScores}
           setUpdateScores={setUpdateScores}
+          updatePlayers={updatePlayers}
+          setUpdatePlayers={setUpdatePlayers}
         />
       )}
     </Stack>

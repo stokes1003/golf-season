@@ -8,9 +8,13 @@ import {
   IconCircleNumber3Filled,
 } from "@tabler/icons-react";
 
-export const Leaderboard = ({ updateScores }) => {
-  const players = useGetPlayers(updateScores);
-  const scores = useGetScores(updateScores);
+export const Leaderboard = ({
+  updateScores,
+  updatePlayers,
+  setUpdatePlayers,
+}) => {
+  const players = useGetPlayers(updatePlayers);
+  const scores = useGetScores(setUpdatePlayers, updateScores);
   const isMobile = useMediaQuery("(max-width: 700px)");
 
   const netAvg = () => {

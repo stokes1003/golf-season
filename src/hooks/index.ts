@@ -76,8 +76,12 @@ export function useGetGolfCourses() {
   return golfCourses;
 }
 
-export function useGetScores(updateScores: Number) {
+export function useGetScores(
+  setUpdatePlayers: React.Dispatch<React.SetStateAction<number>>,
+  updateScores: number
+) {
   const [allScores, setAllScores] = useState<AllScores[]>([]);
+
   useEffect(() => {
     const fetchScores = async () => {
       try {
@@ -87,6 +91,7 @@ export function useGetScores(updateScores: Number) {
           (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
         );
         setAllScores(sortedScores);
+        setUpdatePlayers((prev) => prev + 1);
       } catch (error) {
         console.error("Error fetching scores:", error);
       }
@@ -139,7 +144,7 @@ export function useUpdateWinners() {
 
   return updateWinners;
 }
-export function useGetPlayers(updateScores: Number) {
+export function useGetPlayers(updatePlayers: number) {
   const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
@@ -153,7 +158,8 @@ export function useGetPlayers(updateScores: Number) {
       }
     };
     fetchPlayers();
-  }, [updateScores]);
+    console.log("Players updated");
+  }, [updatePlayers]);
 
   return players;
 }
