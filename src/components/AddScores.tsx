@@ -7,6 +7,7 @@ import {
   Text,
   Avatar,
   Box,
+  Title,
 } from "@mantine/core";
 import React, { useState } from "react";
 import {
@@ -17,11 +18,11 @@ import {
 } from "../hooks";
 import { IconX, IconArrowNarrowLeft } from "@tabler/icons-react";
 
-export const AddScores = () => {
+export const AddScores = ({ setIsLeaderboard }) => {
   const golfCourses = useGetGolfCourses();
   const [golfCourse, setGolfCourse] = useState<string | null>(null);
   const [isScore, setIsScore] = useState(false);
-  const [isGolfCourse, setIsGolfCourse] = useState(false);
+  const [isGolfCourse, setIsGolfCourse] = useState(true);
   const updateWinners = useUpdateWinners();
   const postScores = usePostScores();
   const golfers = useGetPlayers();
@@ -74,13 +75,18 @@ export const AddScores = () => {
 
       setIsAddScore((prev) => !prev);
       setIsScore((prev) => !prev);
+      setIsLeaderboard(true);
     } else {
       setPlayerCounter((prev) => prev + 1);
     }
   };
 
   return (
-    <Stack w={210}>
+    <Stack>
+      <Stack align="center" justify="center" gap="xs">
+        <Title>Fairway Fleas</Title>
+        <Title order={3}>Add A Score</Title>
+      </Stack>
       {isGolfCourse && (
         <Stack align="end">
           <Box
@@ -98,13 +104,14 @@ export const AddScores = () => {
               stroke={1}
               cursor={"pointer"}
               onClick={() => {
-                setIsGolfCourse((prev) => !prev);
+                setIsLeaderboard(true);
                 setIsAddScore((prev) => !prev);
               }}
             />
           </Box>
         </Stack>
       )}
+
       {isScore && (
         <Group justify="space-between">
           <Box
@@ -146,6 +153,7 @@ export const AddScores = () => {
               onClick={() => {
                 setIsScore((prev) => !prev);
                 setIsAddScore((prev) => !prev);
+                setIsLeaderboard(true);
               }}
             />
           </Box>
@@ -216,20 +224,6 @@ export const AddScores = () => {
           </Group>
           <Button w={150} onClick={handleSubmitScores}>
             {playerCounter === 2 ? "Submit Scores" : "Next Player"}
-          </Button>
-        </Stack>
-      )}
-
-      {isAddScore && (
-        <Stack align="center">
-          <Button
-            w={150}
-            onClick={() => {
-              setIsGolfCourse((prev) => !prev);
-              setIsAddScore((prev) => !prev);
-            }}
-          >
-            Add Scores
           </Button>
         </Stack>
       )}

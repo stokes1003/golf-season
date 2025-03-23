@@ -1,5 +1,5 @@
-import { Avatar, Stack, Text, Card, Group, Box } from "@mantine/core";
-import React, { useMemo } from "react";
+import { Avatar, Stack, Text, Card, Group, Box, Title } from "@mantine/core";
+import React from "react";
 import { useGetPlayers, useGetScores } from "../hooks";
 import { useMediaQuery } from "@mantine/hooks";
 import {
@@ -31,6 +31,10 @@ export const Leaderboard = () => {
 
   return (
     <Stack gap="lg" justify="space-evenly">
+      <Stack align="center" justify="center" gap="xs">
+        <Title>Fairway Fleas</Title>
+        <Title order={3}>2025 Season</Title>
+      </Stack>
       <Stack align="center">
         <Text fw={900}>Leaderboard</Text>
       </Stack>

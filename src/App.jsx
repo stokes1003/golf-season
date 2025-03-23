@@ -2,17 +2,22 @@ import { Stack, Title } from "@mantine/core";
 import { OfficialRounds } from "./components/OfficialRounds";
 import { Leaderboard } from "./components/Leaderboard";
 import { AddScores } from "./components/AddScores";
+import { HeaderMenu } from "./components/Header";
+import { useState } from "react";
 
 function App() {
+  const [isLeaderboard, setIsLeaderboard] = useState(true);
   return (
-    <Stack my="xl" align="center" gap="xl">
-      <Stack align="center" justify="center" gap="xs">
-        <Title>Fairway Fleas</Title>
-        <Title order={3}>2025 Season</Title>
-      </Stack>
-      <Leaderboard />
-      <AddScores />
-      <OfficialRounds />
+    <Stack mb="xl" align="center" gap="xl">
+      <HeaderMenu setIsLeaderboard={setIsLeaderboard} />
+      {isLeaderboard ? (
+        <Stack gap="xl">
+          <Leaderboard />
+          <OfficialRounds />
+        </Stack>
+      ) : (
+        <AddScores setIsLeaderboard={setIsLeaderboard} />
+      )}
     </Stack>
   );
 }
