@@ -46,7 +46,9 @@ export function usePostScores() {
       }
 
       const data = await response.json();
-      console.log("Scores submitted successfully:", data);
+      if (data) {
+        console.log("Scores submitted successfully:", data);
+      }
     } catch (error) {
       console.error("Error submitting scores:", error);
     }
