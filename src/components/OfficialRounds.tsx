@@ -35,7 +35,7 @@ export const OfficialRounds = ({ updateScores, setUpdateScores }) => {
       if (response.ok) {
         close();
         setDeleteRoundId(null);
-        setUpdateScores((prev) => prev + 1);
+        setUpdateScores((prev: number) => prev + 1);
       }
     } catch (error) {
       console.error("Error deleting round:", error);

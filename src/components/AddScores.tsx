@@ -82,7 +82,7 @@ export const AddScores = ({
 
       setIsAddScore((prev) => !prev);
       setIsScore((prev) => !prev);
-      setUpdateScores((prev) => prev + 1);
+      setUpdateScores((prev: number) => prev + 1);
       setIsLeaderboard(true);
     } else {
       setPlayerCounter((prev) => prev + 1);

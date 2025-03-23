@@ -76,25 +76,6 @@ export function useGetGolfCourses() {
   return golfCourses;
 }
 
-export function useGetPlayers(updateScores: Number) {
-  const [players, setPlayers] = useState<Player[]>([]);
-
-  useEffect(() => {
-    const fetchPlayers = async () => {
-      try {
-        const response = await fetch("/.netlify/functions/getPlayers");
-        const data = await response.json();
-        setPlayers(data);
-      } catch (error) {
-        console.error("Error fetching players:", error);
-      }
-    };
-    fetchPlayers();
-  }, [updateScores]);
-
-  return players;
-}
-
 export function useGetScores(updateScores: Number) {
   const [allScores, setAllScores] = useState<AllScores[]>([]);
   useEffect(() => {
@@ -157,4 +138,22 @@ export function useUpdateWinners() {
   };
 
   return updateWinners;
+}
+export function useGetPlayers(updateScores: Number) {
+  const [players, setPlayers] = useState<Player[]>([]);
+
+  useEffect(() => {
+    const fetchPlayers = async () => {
+      try {
+        const response = await fetch("/.netlify/functions/getPlayers");
+        const data = await response.json();
+        setPlayers(data);
+      } catch (error) {
+        console.error("Error fetching players:", error);
+      }
+    };
+    fetchPlayers();
+  }, [updateScores]);
+
+  return players;
 }
