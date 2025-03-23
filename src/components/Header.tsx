@@ -1,12 +1,13 @@
 import React from "react";
 import { Burger, Container, Group, Text, Box } from "@mantine/core";
-import { useDisclosure } from "@mantine/hooks";
+import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import classes from "../HeaderMenu.module.css";
 
 const links = ["Add Scores", "Leaderboard"];
 
 export function HeaderMenu({ setIsLeaderboard }) {
   const [opened, { toggle }] = useDisclosure(false);
+  const isMobile = useMediaQuery("(max-width: 767px)");
 
   const items = links.map((link) => (
     <a
@@ -21,7 +22,7 @@ export function HeaderMenu({ setIsLeaderboard }) {
         if (link === "Add Scores") {
           setIsLeaderboard(false);
         }
-        toggle(); // Close menu after clicking
+        toggle();
       }}
     >
       {link}
@@ -40,22 +41,22 @@ export function HeaderMenu({ setIsLeaderboard }) {
               <Text fw={800}>Fairway Fleas</Text>
             </Box>
 
-            {/* Desktop Menu */}
             <Group gap={5} visibleFrom="sm">
               {items}
             </Group>
+            {isMobile && (
+              <>
+                <Burger
+                  opened={opened}
+                  onClick={toggle}
+                  size="sm"
+                  hiddenFrom="sm"
+                />
 
-            {/* Mobile Burger Menu */}
-            <Burger
-              opened={opened}
-              onClick={toggle}
-              size="sm"
-              hiddenFrom="sm"
-            />
+                {opened && <Box className={classes.mobileMenu}>{items}</Box>}
+              </>
+            )}
           </Group>
-
-          {/* Mobile Menu */}
-          {opened && <Box className={classes.mobileMenu}>{items}</Box>}
         </Box>
       </Container>
     </header>
