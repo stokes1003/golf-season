@@ -34,3 +34,24 @@
 .linkLabel {
   margin-right: 5px;
 }
+
+.mobileMenu {
+  position: absolute;
+  top: 56px; /* Aligns it below the header */
+  right: 0;
+  width: 100%;
+  background-color: var(--mantine-color-body);
+  border-bottom: 1px solid
+    light-dark(var(--mantine-color-gray-3), var(--mantine-color-dark-4));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 0;
+  z-index: 100;
+}
+
+.mobileMenu a {
+  padding: 10px 20px;
+  width: 100%;
+  text-align: center;
+}
