@@ -76,7 +76,7 @@ export function useGetGolfCourses() {
   return golfCourses;
 }
 
-export function useGetPlayers() {
+export function useGetPlayers(updateScores: Number) {
   const [players, setPlayers] = useState<Player[]>([]);
 
   useEffect(() => {
@@ -90,12 +90,12 @@ export function useGetPlayers() {
       }
     };
     fetchPlayers();
-  }, []);
+  }, [updateScores]);
 
   return players;
 }
 
-export function useGetScores() {
+export function useGetScores(updateScores: Number) {
   const [allScores, setAllScores] = useState<AllScores[]>([]);
   useEffect(() => {
     const fetchScores = async () => {
@@ -111,7 +111,7 @@ export function useGetScores() {
       }
     };
     fetchScores();
-  }, []);
+  }, [updateScores]);
 
   return allScores;
 }

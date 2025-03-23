@@ -15,19 +15,26 @@ import {
   useGetPlayers,
   usePostScores,
   useUpdateWinners,
+  useGetScores,
 } from "../hooks";
 import { IconX, IconArrowNarrowLeft } from "@tabler/icons-react";
 
-export const AddScores = ({ setIsLeaderboard }) => {
+export const AddScores = ({
+  setIsLeaderboard,
+  updateScores,
+  setUpdateScores,
+}) => {
   const golfCourses = useGetGolfCourses();
   const [golfCourse, setGolfCourse] = useState<string | null>(null);
   const [isScore, setIsScore] = useState(false);
   const [isGolfCourse, setIsGolfCourse] = useState(true);
   const updateWinners = useUpdateWinners();
   const postScores = usePostScores();
-  const golfers = useGetPlayers();
+  const golfers = useGetPlayers(updateScores);
+  const scores = useGetScores(updateScores);
   const [isAddScore, setIsAddScore] = useState(true);
   const [playerCounter, setPlayerCounter] = useState(0);
+
   const [playerScores, setPlayerScores] = useState([
     { player: "Travis", gross: "", hcp: "" },
     { player: "Stokes", gross: "", hcp: "" },
@@ -75,6 +82,7 @@ export const AddScores = ({ setIsLeaderboard }) => {
 
       setIsAddScore((prev) => !prev);
       setIsScore((prev) => !prev);
+      setUpdateScores((prev) => prev + 1);
       setIsLeaderboard(true);
     } else {
       setPlayerCounter((prev) => prev + 1);

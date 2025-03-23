@@ -12,9 +12,9 @@ import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import React, { useState } from "react";
 import { useGetPlayers, useGetGolfCourses, useGetScores } from "../hooks";
 
-export const OfficialRounds = () => {
-  const allScores = useGetScores();
-  const players = useGetPlayers();
+export const OfficialRounds = ({ updateScores, setUpdateScores }) => {
+  const allScores = useGetScores(updateScores);
+  const players = useGetPlayers(updateScores);
   const golfCourses = useGetGolfCourses();
   const [deleteRoundId, setDeleteRoundId] = useState<string | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
@@ -35,6 +35,7 @@ export const OfficialRounds = () => {
       if (response.ok) {
         close();
         setDeleteRoundId(null);
+        setUpdateScores((prev) => prev + 1);
       }
     } catch (error) {
       console.error("Error deleting round:", error);
