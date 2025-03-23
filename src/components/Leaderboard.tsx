@@ -157,7 +157,7 @@ export const Leaderboard = ({ updateScores }) => {
                       </Text>
                     </Group>
                     <Group
-                      key={`netAvg-${player.player}`}
+                      key={`grossAvg-${player.player}`}
                       justify="space-between"
                       gap={52}
                     >
@@ -258,7 +258,7 @@ export const Leaderboard = ({ updateScores }) => {
                         </Text>
                       </Group>
                       <Group
-                        key={`netAvg-${player.player}`}
+                        key={`grossAvg-${player.player}`}
                         justify="space-between"
                         gap={52}
                       >

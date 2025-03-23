@@ -34,6 +34,7 @@ const handler: Handler = async (event) => {
     );
 
     const updatedScores = await playersCollection.find({}).toArray();
+    console.log(updatedScores);
     return { statusCode: 200, body: JSON.stringify(updatedScores) };
   } catch (error) {
     console.error(error);
