@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Burger, Container, Group, Text, Box } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import classes from "../HeaderMenu.module.css";
@@ -21,7 +21,6 @@ export function HeaderMenu({ setIsLeaderboard }) {
         if (link === "Add Scores") {
           setIsLeaderboard(false);
         }
-        toggle();
       }}
     >
       {link}
@@ -43,16 +42,8 @@ export function HeaderMenu({ setIsLeaderboard }) {
             <Group gap={5} visibleFrom="sm">
               {items}
             </Group>
-
-            <Burger
-              opened={opened}
-              onClick={toggle}
-              size="sm"
-              hiddenFrom="sm"
-            />
           </Group>
-
-          {opened && <Box className={classes.mobileMenu}>{items}</Box>}
+          <Burger opened={opened} onClick={toggle} size="sm" hiddenFrom="sm" />
         </Box>
       </Container>
     </header>
