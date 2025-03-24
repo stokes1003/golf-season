@@ -57,7 +57,7 @@ export function usePostScores() {
   return postScores;
 }
 
-export function useGetGolfCourses() {
+export function useGetGolfCourses(updateScores: number) {
   const [golfCourses, setGolfCourses] = useState<GolfCourse[]>([]);
 
   useEffect(() => {
@@ -71,7 +71,7 @@ export function useGetGolfCourses() {
       }
     };
     fetchGolfCourses();
-  }, []);
+  }, [updateScores]);
 
   return golfCourses;
 }

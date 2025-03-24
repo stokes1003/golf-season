@@ -26,7 +26,7 @@ export const AddScores = ({
   updatePlayers,
   setUpdatePlayers,
 }) => {
-  const golfCourses = useGetGolfCourses();
+  const golfCourses = useGetGolfCourses(updateScores);
   const [golfCourse, setGolfCourse] = useState<string | null>(null);
   const [isScore, setIsScore] = useState(false);
   const [isGolfCourse, setIsGolfCourse] = useState(true);
