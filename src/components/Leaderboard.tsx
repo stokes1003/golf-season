@@ -141,30 +141,30 @@ export const Leaderboard = ({
                     <Group
                       key={`netWins-${player.player}`}
                       justify="space-between"
-                      gap={52}
+                      gap={28}
                     >
-                      <Text fw={600} w={48}>
-                        NetWins:
+                      <Text fw={600} w={95} style={{ textAlign: "right" }}>
+                        Net Wins:
                       </Text>
                       <Text>{player.netWins}</Text>
                     </Group>
                     <Group
                       key={`grossWins-${player.player}`}
                       justify="space-between"
-                      gap={52}
+                      gap={28}
                     >
-                      <Text fw={600} w={48}>
-                        GrsWins:
+                      <Text fw={600} w={95} style={{ textAlign: "right" }}>
+                        Gross Wins:
                       </Text>
                       <Text>{player.grossWins}</Text>
                     </Group>
                     <Group
                       key={`netAvg-${player.player}`}
                       justify="space-between"
-                      gap={52}
+                      gap={28}
                     >
-                      <Text fw={600} w={48}>
-                        NetAvg:
+                      <Text fw={600} w={95} style={{ textAlign: "right" }}>
+                        Net Avg:
                       </Text>
                       <Text>
                         {netAvg().find((avg) => avg.player === player.player)
@@ -174,10 +174,10 @@ export const Leaderboard = ({
                     <Group
                       key={`grossAvg-${player.player}`}
                       justify="space-between"
-                      gap={52}
+                      gap={28}
                     >
-                      <Text fw={600} w={48}>
-                        GrsAvg:
+                      <Text fw={600} w={95} style={{ textAlign: "right" }}>
+                        Gross Avg:
                       </Text>
                       <Text>
                         {grossAvg().find((avg) => avg.player === player.player)
