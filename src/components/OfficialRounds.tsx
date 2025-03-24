@@ -38,9 +38,9 @@ export const OfficialRounds = ({
         body: JSON.stringify({ _id: deleteRoundId }),
       });
       if (response.ok) {
-        close();
         setDeleteRoundId(null);
         setUpdateScores((prev: number) => prev + 1);
+        close();
       }
     } catch (error) {
       console.error("Error deleting round:", error);

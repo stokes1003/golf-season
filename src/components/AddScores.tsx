@@ -15,7 +15,6 @@ import {
   useGetPlayers,
   usePostScores,
   useUpdateWinners,
-  useGetScores,
 } from "../hooks";
 import { IconX, IconArrowNarrowLeft } from "@tabler/icons-react";
 
@@ -24,7 +23,6 @@ export const AddScores = ({
   updateScores,
   setUpdateScores,
   updatePlayers,
-  setUpdatePlayers,
 }) => {
   const golfCourses = useGetGolfCourses(updateScores);
   const [golfCourse, setGolfCourse] = useState<string | null>(null);
@@ -33,8 +31,7 @@ export const AddScores = ({
   const updateWinners = useUpdateWinners();
   const postScores = usePostScores();
   const golfers = useGetPlayers(updatePlayers);
-  const scores = useGetScores(setUpdatePlayers, updateScores);
-  const [isAddScore, setIsAddScore] = useState(true);
+
   const [playerCounter, setPlayerCounter] = useState(0);
 
   const [playerScores, setPlayerScores] = useState([
@@ -43,7 +40,7 @@ export const AddScores = ({
     { player: "JP", gross: "", hcp: "" },
   ]);
 
-  const handleSubmitScores = () => {
+  const handleSubmitScores = async () => {
     const gross = parseInt(playerScores[playerCounter].gross, 10);
     const handicap = parseInt(playerScores[playerCounter].hcp, 10);
 
@@ -62,8 +59,8 @@ export const AddScores = ({
     }
 
     if (playerCounter === 2) {
-      setPlayerCounter(0);
-      postScores({
+      setIsLeaderboard(true);
+      await postScores({
         course: golfCourse!,
         date: new Date(),
         scores: playerScores.map((player) => ({
@@ -73,7 +70,7 @@ export const AddScores = ({
           net: parseInt(player.gross, 10) - parseInt(player.hcp, 10),
         })),
       });
-      updateWinners({
+      await updateWinners({
         scores: playerScores.map((player) => ({
           player: player.player,
           gross: parseInt(player.gross, 10),
@@ -81,11 +78,9 @@ export const AddScores = ({
           net: parseInt(player.gross, 10) - parseInt(player.hcp, 10),
         })),
       });
-
-      setIsAddScore((prev) => !prev);
+      setPlayerCounter(0);
       setIsScore((prev) => !prev);
       setUpdateScores((prev: number) => prev + 1);
-      setIsLeaderboard(true);
     } else {
       setPlayerCounter((prev) => prev + 1);
     }
@@ -115,7 +110,6 @@ export const AddScores = ({
               cursor={"pointer"}
               onClick={() => {
                 setIsLeaderboard(true);
-                setIsAddScore((prev) => !prev);
               }}
             />
           </Box>
@@ -162,7 +156,7 @@ export const AddScores = ({
               cursor={"pointer"}
               onClick={() => {
                 setIsScore((prev) => !prev);
-                setIsAddScore((prev) => !prev);
+
                 setIsLeaderboard(true);
               }}
             />
