@@ -49,10 +49,21 @@ export const Leaderboard = ({
   };
 
   const sortedPlayers = () => {
+    const netAverages = netAvg();
+    const netAvgMap = new Map(netAverages.map((p) => [p.player, p.avg]));
+
     const sorted = [...players].sort((a, b) => {
       if (b.netWins !== a.netWins) {
         return b.netWins - a.netWins;
       }
+
+      const aNetAvg = netAvgMap.get(a.player) || 0;
+      const bNetAvg = netAvgMap.get(b.player) || 0;
+
+      if (aNetAvg !== bNetAvg) {
+        return aNetAvg - bNetAvg;
+      }
+
       return b.grossWins - a.grossWins;
     });
 
@@ -133,7 +144,7 @@ export const Leaderboard = ({
                       gap={52}
                     >
                       <Text fw={600} w={48}>
-                        NWins:
+                        NetWins:
                       </Text>
                       <Text>{player.netWins}</Text>
                     </Group>
@@ -143,7 +154,7 @@ export const Leaderboard = ({
                       gap={52}
                     >
                       <Text fw={600} w={48}>
-                        GWins:
+                        GrsWins:
                       </Text>
                       <Text>{player.grossWins}</Text>
                     </Group>
@@ -153,7 +164,7 @@ export const Leaderboard = ({
                       gap={52}
                     >
                       <Text fw={600} w={48}>
-                        NAvg:
+                        NetAvg:
                       </Text>
                       <Text>
                         {netAvg().find((avg) => avg.player === player.player)
@@ -166,7 +177,7 @@ export const Leaderboard = ({
                       gap={52}
                     >
                       <Text fw={600} w={48}>
-                        GAvg:
+                        GrsAvg:
                       </Text>
                       <Text>
                         {grossAvg().find((avg) => avg.player === player.player)
