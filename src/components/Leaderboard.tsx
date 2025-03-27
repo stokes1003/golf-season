@@ -245,7 +245,7 @@ export const Leaderboard = ({
                         gap={52}
                       >
                         <Text fw={600} w={48}>
-                          NWins
+                          NPts:
                         </Text>
                         <Text>{player.netWins}</Text>
                       </Group>
@@ -255,7 +255,7 @@ export const Leaderboard = ({
                         gap={52}
                       >
                         <Text fw={600} w={48}>
-                          GWins
+                          GPts:
                         </Text>
                         <Text>{player.grossWins}</Text>
                       </Group>
