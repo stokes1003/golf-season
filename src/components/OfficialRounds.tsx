@@ -81,7 +81,7 @@ export const OfficialRounds = ({
                 <Image
                   w={352}
                   h={200}
-                  radius="md"
+                  radius="lg"
                   src={
                     golfCourses.find((c) => c.courseName === round.course)?.img
                   }
