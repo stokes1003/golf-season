@@ -57,7 +57,6 @@ export const OfficialRounds = ({
           <Card
             key={round._id.toString()}
             shadow="lg"
-            pt="sm"
             pb="lg"
             radius="lg"
             withBorder
@@ -78,14 +77,16 @@ export const OfficialRounds = ({
             onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
             <Stack align="center">
-              <Image
-                w={328}
-                h={180}
-                radius="md"
-                src={
-                  golfCourses.find((c) => c.courseName === round.course)?.img
-                }
-              />
+              <Card.Section>
+                <Image
+                  w={352}
+                  h={200}
+                  radius="md"
+                  src={
+                    golfCourses.find((c) => c.courseName === round.course)?.img
+                  }
+                />
+              </Card.Section>
               <Stack gap="xs" align="center">
                 <Text fw={800}>{round.course}</Text>
                 <Text>{new Date(round.date).toLocaleDateString()}</Text>
