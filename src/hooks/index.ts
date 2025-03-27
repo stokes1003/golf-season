@@ -104,13 +104,11 @@ export function useGetScores(
 
 export function useUpdateWinners() {
   const updateWinners = async (round) => {
-    const netWinner = round.scores.reduce((prev, current) =>
-      current.net <= prev.net ? current : prev
-    );
+    const netMin = Math.min(...round.scores.map((s) => s.net));
+    const netWinners = round.scores.filter((s) => s.net === netMin);
 
-    const grossWinner = round.scores.reduce((prev, current) =>
-      current.gross <= prev.gross ? current : prev
-    );
+    const grossMin = Math.min(...round.scores.map((s) => s.gross));
+    const grossWinners = round.scores.filter((s) => s.gross === grossMin);
 
     try {
       const response = await fetch("/.netlify/functions/updatePlayerWins", {
@@ -119,8 +117,8 @@ export function useUpdateWinners() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          netWinner: netWinner.player,
-          grossWinner: grossWinner.player,
+          netWinners: netWinners.map((w) => w.player),
+          grossWinners: grossWinners.map((w) => w.player),
         }),
       });
 
@@ -144,6 +142,7 @@ export function useUpdateWinners() {
 
   return updateWinners;
 }
+
 export function useGetPlayers(updatePlayers: number) {
   const [players, setPlayers] = useState<Player[]>([]);
 

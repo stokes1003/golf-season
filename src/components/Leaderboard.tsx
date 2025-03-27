@@ -144,7 +144,7 @@ export const Leaderboard = ({
                       gap={28}
                     >
                       <Text fw={600} w={95} style={{ textAlign: "right" }}>
-                        Net Wins:
+                        Net Pts:
                       </Text>
                       <Text>{player.netWins}</Text>
                     </Group>
@@ -154,7 +154,7 @@ export const Leaderboard = ({
                       gap={28}
                     >
                       <Text fw={600} w={95} style={{ textAlign: "right" }}>
-                        Gross Wins:
+                        Gross Pts:
                       </Text>
                       <Text>{player.grossWins}</Text>
                     </Group>
