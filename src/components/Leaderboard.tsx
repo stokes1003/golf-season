@@ -61,6 +61,41 @@ export const Leaderboard = ({
     });
   };
 
+  const bestNet = () => {
+    if (!scores || scores.length === 0) return [];
+
+    const bestScores = new Map();
+
+    scores.forEach((round) => {
+      round.scores.forEach(({ player, net }) => {
+        if (!bestScores.has(player) || net < bestScores.get(player)) {
+          bestScores.set(player, net);
+        }
+      });
+    });
+
+    return Array.from(bestScores, ([player, bestNet]) => ({ player, bestNet }));
+  };
+
+  const bestGross = () => {
+    if (!scores || scores.length === 0) return [];
+
+    const bestScores = new Map();
+
+    scores.forEach((round) => {
+      round.scores.forEach(({ player, gross }) => {
+        if (!bestScores.has(player) || gross < bestScores.get(player)) {
+          bestScores.set(player, gross);
+        }
+      });
+    });
+
+    return Array.from(bestScores, ([player, bestGross]) => ({
+      player,
+      bestGross,
+    }));
+  };
+
   const netSortedPlayers = () => {
     const netAverages = netAvg();
     const netAvgMap = new Map(netAverages.map((p) => [p.player, p.avg]));
@@ -122,7 +157,11 @@ export const Leaderboard = ({
           opened={isMobile ? tooltip : undefined}
           withArrow
           transitionProps={{ duration: 200 }}
-          label="Net Points represent a player's net wins, with 3 points awarded for an outright win and 1 point for a tie. If there is a tie in total Net Points, the tiebreaker is determined by Net Average, which is calculated as the player's total net score divided by the number of rounds played. A lower Net Average wins the tiebreaker."
+          label={
+            netSwitch
+              ? "Net Points represent a player's net wins, with 3 points awarded for an outright win and 1 point for a tie. If there is a tie in total Net Points, the tiebreaker is determined by Net Average, which is calculated as the player's total net score divided by the number of rounds played. A lower Net Average wins the tiebreaker. Best Net refers to the lowest net score the player has recorded in a single round during the season."
+              : "Gross Points represent a player's gross wins, with 3 points awarded for an outright win and 1 point for a tie. If there is a tie in total Gross Points, the tiebreaker is determined by Gross Average, which is calculated as the player's total gross score divided by the number of rounds played. A lower Gross Average wins the tiebreaker. Best Gross refers to the lowest gross score the player has recorded in a single round during the season."
+          }
         >
           <IconInfoCircle
             stroke={2}
@@ -144,11 +183,11 @@ export const Leaderboard = ({
                     w={240}
                     h={
                       index === 1
-                        ? 320
-                        : index === 0
                         ? 300
-                        : index === 2
+                        : index === 0
                         ? 280
+                        : index === 2
+                        ? 260
                         : 180
                     }
                     key={player.player}
@@ -188,56 +227,115 @@ export const Leaderboard = ({
                         <Avatar size="lg" src={player.img} />
                         <Text fw={800}>{player.player}</Text>
                       </Stack>
-                      <Stack gap="sm">
-                        <Group
-                          key={`netWins-${player.player}`}
-                          justify="space-between"
-                          gap={28}
-                        >
-                          <Text fw={600} w={95} style={{ textAlign: "right" }}>
-                            Net Pts:
-                          </Text>
-                          <Text>{player.netWins}</Text>
-                        </Group>
-                        <Group
-                          key={`grossWins-${player.player}`}
-                          justify="space-between"
-                          gap={28}
-                        >
-                          <Text fw={600} w={95} style={{ textAlign: "right" }}>
-                            Gross Pts:
-                          </Text>
-                          <Text>{player.grossWins}</Text>
-                        </Group>
-                        <Group
-                          key={`netAvg-${player.player}`}
-                          justify="space-between"
-                          gap={28}
-                        >
-                          <Text fw={600} w={95} style={{ textAlign: "right" }}>
-                            Net Avg:
-                          </Text>
-                          <Text>
-                            {netAvg().find(
-                              (avg) => avg.player === player.player
-                            )?.avg ?? "N/A"}
-                          </Text>
-                        </Group>
-                        <Group
-                          key={`grossAvg-${player.player}`}
-                          justify="space-between"
-                          gap={28}
-                        >
-                          <Text fw={600} w={95} style={{ textAlign: "right" }}>
-                            Gross Avg:
-                          </Text>
-                          <Text>
-                            {grossAvg().find(
-                              (avg) => avg.player === player.player
-                            )?.avg ?? "N/A"}
-                          </Text>
-                        </Group>
-                      </Stack>
+
+                      {netSwitch ? (
+                        <Stack gap="sm">
+                          <Group
+                            key={`netWins-${player.player}`}
+                            justify="space-between"
+                            gap={28}
+                          >
+                            <Text
+                              fw={600}
+                              w={95}
+                              style={{ textAlign: "right" }}
+                            >
+                              Net Pts:
+                            </Text>
+                            <Text>{player.netWins}</Text>
+                          </Group>
+                          <Group
+                            key={`netAvg-${player.player}`}
+                            justify="space-between"
+                            gap={28}
+                          >
+                            <Text
+                              fw={600}
+                              w={95}
+                              style={{ textAlign: "right" }}
+                            >
+                              Net Avg:
+                            </Text>
+                            <Text>
+                              {netAvg().find(
+                                (avg) => avg.player === player.player
+                              )?.avg ?? "N/A"}
+                            </Text>
+                          </Group>
+                          <Group
+                            key={`bestNet-${player.player}`}
+                            justify="space-between"
+                            gap={28}
+                          >
+                            <Text
+                              fw={600}
+                              w={95}
+                              style={{ textAlign: "right" }}
+                            >
+                              Best Net:
+                            </Text>
+                            <Text>
+                              {bestNet().find(
+                                (avg) => avg.player === player.player
+                              )?.bestNet ?? "N/A"}
+                            </Text>
+                          </Group>
+                        </Stack>
+                      ) : (
+                        <Stack gap="sm">
+                          <Group
+                            key={`grossWins-${player.player}`}
+                            justify="space-between"
+                            gap={28}
+                          >
+                            <Text
+                              fw={600}
+                              w={95}
+                              style={{ textAlign: "right" }}
+                            >
+                              Gross Pts:
+                            </Text>
+                            <Text>{player.grossWins}</Text>
+                          </Group>
+
+                          <Group
+                            key={`grossAvg-${player.player}`}
+                            justify="space-between"
+                            gap={28}
+                          >
+                            <Text
+                              fw={600}
+                              w={95}
+                              style={{ textAlign: "right" }}
+                            >
+                              Gross Avg:
+                            </Text>
+                            <Text>
+                              {grossAvg().find(
+                                (avg) => avg.player === player.player
+                              )?.avg ?? "N/A"}
+                            </Text>
+                          </Group>
+                          <Group
+                            key={`bestGross-${player.player}`}
+                            justify="space-between"
+                            gap={28}
+                          >
+                            <Text
+                              fw={600}
+                              w={95}
+                              style={{ textAlign: "right" }}
+                            >
+                              Best Gross:
+                            </Text>
+                            <Text>
+                              {bestGross().find(
+                                (avg) => avg.player === player.player
+                              )?.bestGross ?? "N/A"}
+                            </Text>
+                          </Group>
+                        </Stack>
+                      )}
                     </Stack>
                   </Card>
                 )
@@ -274,7 +372,7 @@ export const Leaderboard = ({
                     radius="lg"
                     withBorder
                     w={260}
-                    h={300}
+                    h={280}
                     key={player.player}
                     style={{
                       boxShadow:
@@ -313,54 +411,114 @@ export const Leaderboard = ({
                         <Text fw={800}>{player.player}</Text>
                       </Stack>
                       <Stack>
-                        <Group
-                          key={`netWins-${player.player}`}
-                          justify="space-between"
-                          gap={52}
-                        >
-                          <Text fw={600} w={95} style={{ textAlign: "right" }}>
-                            Net Pts:
-                          </Text>
-                          <Text>{player.netWins}</Text>
-                        </Group>
-                        <Group
-                          key={`grossWins-${player.player}`}
-                          justify="space-between"
-                          gap={52}
-                        >
-                          <Text fw={600} w={95} style={{ textAlign: "right" }}>
-                            Gross Pts:
-                          </Text>
-                          <Text>{player.grossWins}</Text>
-                        </Group>
-                        <Group
-                          key={`netAvg-${player.player}`}
-                          justify="space-between"
-                          gap={52}
-                        >
-                          <Text fw={600} w={95} style={{ textAlign: "right" }}>
-                            Net Avg:
-                          </Text>
-                          <Text>
-                            {netAvg().find(
-                              (avg) => avg.player === player.player
-                            )?.avg ?? "N/A"}
-                          </Text>
-                        </Group>
-                        <Group
-                          key={`grossAvg-${player.player}`}
-                          justify="space-between"
-                          gap={52}
-                        >
-                          <Text fw={600} w={95} style={{ textAlign: "right" }}>
-                            Gross Avg:
-                          </Text>
-                          <Text>
-                            {grossAvg().find(
-                              (avg) => avg.player === player.player
-                            )?.avg ?? "N/A"}
-                          </Text>
-                        </Group>
+                        {netSwitch ? (
+                          <Stack>
+                            <Group
+                              key={`netWins-${player.player}`}
+                              justify="space-between"
+                              gap={52}
+                            >
+                              <Text
+                                fw={600}
+                                w={95}
+                                style={{ textAlign: "right" }}
+                              >
+                                Net Pts:
+                              </Text>
+                              <Text>{player.netWins}</Text>
+                            </Group>
+                            <Group
+                              key={`netAvg-${player.player}`}
+                              justify="space-between"
+                              gap={52}
+                            >
+                              <Text
+                                fw={600}
+                                w={95}
+                                style={{ textAlign: "right" }}
+                              >
+                                Net Avg:
+                              </Text>
+                              <Text>
+                                {netAvg().find(
+                                  (avg) => avg.player === player.player
+                                )?.avg ?? "N/A"}
+                              </Text>
+                            </Group>
+                            <Group
+                              key={`bestNet-${player.player}`}
+                              justify="space-between"
+                              gap={52}
+                            >
+                              <Text
+                                fw={600}
+                                w={95}
+                                style={{ textAlign: "right" }}
+                              >
+                                Best Net:
+                              </Text>
+                              <Text>
+                                {bestNet().find(
+                                  (avg) => avg.player === player.player
+                                )?.bestNet ?? "N/A"}
+                              </Text>
+                            </Group>
+                          </Stack>
+                        ) : (
+                          <Stack>
+                            <Group
+                              key={`grossWins-${player.player}`}
+                              justify="space-between"
+                              gap={52}
+                            >
+                              <Text
+                                fw={600}
+                                w={95}
+                                style={{ textAlign: "right" }}
+                              >
+                                Gross Pts:
+                              </Text>
+                              <Text>{player.grossWins}</Text>
+                            </Group>
+
+                            <Group
+                              key={`grossAvg-${player.player}`}
+                              justify="space-between"
+                              gap={52}
+                            >
+                              <Text
+                                fw={600}
+                                w={95}
+                                style={{ textAlign: "right" }}
+                              >
+                                Gross Avg:
+                              </Text>
+                              <Text>
+                                {grossAvg().find(
+                                  (avg) => avg.player === player.player
+                                )?.avg ?? "N/A"}
+                              </Text>
+                            </Group>
+                            <Group
+                              key={`bestGross-${player.player}`}
+                              justify="space-between"
+                              gap={52}
+                            >
+                              <Text
+                                fw={600}
+                                w={95}
+                                style={{ textAlign: "right" }}
+                              >
+                                Best Gross:
+                              </Text>
+                              <Text>
+                                {bestGross().find(
+                                  (avg) => avg.player === player.player
+                                )?.bestGross ?? "N/A"}
+                              </Text>
+                            </Group>
+                          </Stack>
+                        )}
                       </Stack>
                     </Stack>
                   </Card>
