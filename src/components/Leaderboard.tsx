@@ -262,7 +262,11 @@ export const Leaderboard = ({
             </Stack>
             <Stack align="center" justify="center">
               {players
-                .sort((a, b) => b.netWins - a.netWins)
+                .sort((a, b) => {
+                  return netSwitch
+                    ? b.netWins - a.netWins
+                    : b.grossWins - a.grossWins;
+                })
                 .map((player, index) => (
                   <Card
                     shadow="sm"
