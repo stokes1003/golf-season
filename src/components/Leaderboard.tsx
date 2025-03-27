@@ -1,11 +1,21 @@
-import { Avatar, Stack, Text, Card, Group, Box, Title } from "@mantine/core";
-import React from "react";
+import {
+  Avatar,
+  Stack,
+  Text,
+  Card,
+  Group,
+  Box,
+  Title,
+  Tooltip,
+} from "@mantine/core";
+import React, { useState } from "react";
 import { useGetPlayers, useGetScores } from "../hooks";
 import { useMediaQuery } from "@mantine/hooks";
 import {
   IconCircleNumber1Filled,
   IconCircleNumber2Filled,
   IconCircleNumber3Filled,
+  IconInfoCircle,
 } from "@tabler/icons-react";
 
 export const Leaderboard = ({
@@ -13,6 +23,7 @@ export const Leaderboard = ({
   updatePlayers,
   setUpdatePlayers,
 }) => {
+  const [tooltip, setTooltip] = useState(false);
   const players = useGetPlayers(updatePlayers);
   const scores = useGetScores(setUpdatePlayers, updateScores);
   const isMobile = useMediaQuery("(max-width: 700px)");
@@ -78,9 +89,22 @@ export const Leaderboard = ({
         <Title>Fairway Fleas</Title>
         <Title order={3}>2025 Season</Title>
       </Stack>
-      <Stack align="center">
+      <Group align="center" justify="center" gap="xs">
         <Text fw={900}>Leaderboard</Text>
-      </Stack>
+        <Tooltip
+          multiline
+          w={220}
+          opened={isMobile ? tooltip : undefined}
+          withArrow
+          transitionProps={{ duration: 200 }}
+          label="Net Points represent a player's net wins, with 3 points awarded for an outright win and 1 point for a tie. If there is a tie in total Net Points, the tiebreaker is determined by Net Average, which is calculated as the player's total net score divided by the number of rounds played. A lower Net Average wins the tiebreaker."
+        >
+          <IconInfoCircle
+            stroke={2}
+            onClick={isMobile ? () => setTooltip((o) => !o) : undefined}
+          />
+        </Tooltip>
+      </Group>
       <Stack>
         {!isMobile ? (
           <Group gap="lg" style={{ alignItems: "self-end" }}>
