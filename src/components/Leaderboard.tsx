@@ -7,6 +7,7 @@ import {
   Box,
   Title,
   Tooltip,
+  Switch,
 } from "@mantine/core";
 import React, { useState } from "react";
 import { useGetPlayers, useGetScores } from "../hooks";
@@ -24,6 +25,7 @@ export const Leaderboard = ({
   setUpdatePlayers,
 }) => {
   const [tooltip, setTooltip] = useState(false);
+  const [netSwitch, setNetSwitch] = useState(true);
   const players = useGetPlayers(updatePlayers);
   const scores = useGetScores(setUpdatePlayers, updateScores);
   const isMobile = useMediaQuery("(max-width: 700px)");
@@ -59,7 +61,7 @@ export const Leaderboard = ({
     });
   };
 
-  const sortedPlayers = () => {
+  const netSortedPlayers = () => {
     const netAverages = netAvg();
     const netAvgMap = new Map(netAverages.map((p) => [p.player, p.avg]));
 
@@ -76,6 +78,29 @@ export const Leaderboard = ({
       }
 
       return b.grossWins - a.grossWins;
+    });
+
+    return [sorted[1], sorted[0], sorted[2], ...sorted.slice(3)].filter(
+      Boolean
+    );
+  };
+  const grossSortedPlayers = () => {
+    const grossAverages = grossAvg();
+    const grossAvgMap = new Map(grossAverages.map((p) => [p.player, p.avg]));
+
+    const sorted = [...players].sort((a, b) => {
+      if (b.grossWins !== a.grossWins) {
+        return b.grossWins - a.grossWins;
+      }
+
+      const aGrossAvg = grossAvgMap.get(a.player) || 0;
+      const bGrossAvg = grossAvgMap.get(b.player) || 0;
+
+      if (aGrossAvg !== bGrossAvg) {
+        return aGrossAvg - bGrossAvg;
+      }
+
+      return b.netWins - a.netWins;
     });
 
     return [sorted[1], sorted[0], sorted[2], ...sorted.slice(3)].filter(
@@ -107,213 +132,236 @@ export const Leaderboard = ({
       </Group>
       <Stack>
         {!isMobile ? (
-          <Group gap="lg" style={{ alignItems: "self-end" }}>
-            {sortedPlayers().map((player, index) => (
-              <Card
-                shadow="sm"
-                padding="lg"
-                radius="lg"
-                withBorder
-                w={240}
-                h={
-                  index === 1
-                    ? 320
-                    : index === 0
-                    ? 300
-                    : index === 2
-                    ? 280
-                    : 180
-                }
-                key={player.player}
-                style={{
-                  boxShadow:
-                    index === 1
-                      ? "0 0 12px rgba(255, 215, 0, 0.6)"
-                      : index === 0
-                      ? "0 0 12px rgba(167, 167, 173, 0.6)"
-                      : index === 2
-                      ? "0 0 12px rgba(167, 112, 68, 0.6)"
-                      : "none",
-
-                  transition: "transform 0.2s ease-in-out",
-                  transformOrigin: "center",
-                }}
-                onMouseEnter={(e) =>
-                  (e.currentTarget.style.transform = "scale(0.98)")
-                }
-                onMouseLeave={(e) =>
-                  (e.currentTarget.style.transform = "scale(1)")
-                }
-              >
-                <Box pos="absolute" top="0" left="0">
-                  {index === 1 && (
-                    <IconCircleNumber1Filled size="30" color="#D6AF36" />
-                  )}
-                  {index === 0 && (
-                    <IconCircleNumber2Filled size="30" color="#A7A7AD" />
-                  )}
-                  {index === 2 && (
-                    <IconCircleNumber3Filled size="30" color="#A77044" />
-                  )}
-                </Box>
-                <Stack gap="lg" align="center">
-                  <Stack align="center" gap="sm">
-                    <Avatar size="lg" src={player.img} />
-                    <Text fw={800}>{player.player}</Text>
-                  </Stack>
-                  <Stack gap="sm">
-                    <Group
-                      key={`netWins-${player.player}`}
-                      justify="space-between"
-                      gap={28}
-                    >
-                      <Text fw={600} w={95} style={{ textAlign: "right" }}>
-                        Net Pts:
-                      </Text>
-                      <Text>{player.netWins}</Text>
-                    </Group>
-                    <Group
-                      key={`grossWins-${player.player}`}
-                      justify="space-between"
-                      gap={28}
-                    >
-                      <Text fw={600} w={95} style={{ textAlign: "right" }}>
-                        Gross Pts:
-                      </Text>
-                      <Text>{player.grossWins}</Text>
-                    </Group>
-                    <Group
-                      key={`netAvg-${player.player}`}
-                      justify="space-between"
-                      gap={28}
-                    >
-                      <Text fw={600} w={95} style={{ textAlign: "right" }}>
-                        Net Avg:
-                      </Text>
-                      <Text>
-                        {netAvg().find((avg) => avg.player === player.player)
-                          ?.avg ?? "N/A"}
-                      </Text>
-                    </Group>
-                    <Group
-                      key={`grossAvg-${player.player}`}
-                      justify="space-between"
-                      gap={28}
-                    >
-                      <Text fw={600} w={95} style={{ textAlign: "right" }}>
-                        Gross Avg:
-                      </Text>
-                      <Text>
-                        {grossAvg().find((avg) => avg.player === player.player)
-                          ?.avg ?? "N/A"}
-                      </Text>
-                    </Group>
-                  </Stack>
-                </Stack>
-              </Card>
-            ))}
-          </Group>
-        ) : (
-          <Stack align="center" justify="center">
-            {players
-              .sort((a, b) => b.netWins - a.netWins)
-              .map((player, index) => (
-                <Card
-                  shadow="sm"
-                  padding="lg"
-                  radius="lg"
-                  withBorder
-                  w={260}
-                  h={300}
-                  key={player.player}
-                  style={{
-                    boxShadow:
-                      index === 0
-                        ? "0 0 12px rgba(255, 215, 0, 0.6)"
-                        : index === 1
-                        ? "0 0 12px rgba(167, 167, 173, 0.6)"
+          <Stack gap="lg">
+            <Group gap="lg" style={{ alignItems: "self-end" }}>
+              {(netSwitch ? netSortedPlayers() : grossSortedPlayers()).map(
+                (player, index) => (
+                  <Card
+                    shadow="sm"
+                    padding="lg"
+                    radius="lg"
+                    withBorder
+                    w={240}
+                    h={
+                      index === 1
+                        ? 320
+                        : index === 0
+                        ? 300
                         : index === 2
-                        ? "0 0 12px rgba(167, 112, 68, 0.6)"
-                        : "none",
+                        ? 280
+                        : 180
+                    }
+                    key={player.player}
+                    style={{
+                      boxShadow:
+                        index === 1
+                          ? "0 0 12px rgba(255, 215, 0, 0.6)"
+                          : index === 0
+                          ? "0 0 12px rgba(167, 167, 173, 0.6)"
+                          : index === 2
+                          ? "0 0 12px rgba(167, 112, 68, 0.6)"
+                          : "none",
 
-                    transition: "transform 0.2s ease-in-out",
-                    transformOrigin: "center",
-                  }}
-                  onMouseEnter={(e) =>
-                    (e.currentTarget.style.transform = "scale(0.98)")
-                  }
-                  onMouseLeave={(e) =>
-                    (e.currentTarget.style.transform = "scale(1)")
-                  }
-                >
-                  <Box pos="absolute" top="0" left="0">
-                    {index === 0 && (
-                      <IconCircleNumber1Filled size="30" color="#D6AF36" />
-                    )}
-                    {index === 1 && (
-                      <IconCircleNumber2Filled size="30" color="#A7A7AD" />
-                    )}
-                    {index === 2 && (
-                      <IconCircleNumber3Filled size="30" color="#A77044" />
-                    )}
-                  </Box>
-                  <Stack gap="lg" align="center">
-                    <Stack align="center" gap="sm">
-                      <Avatar size="lg" src={player.img} />
-                      <Text fw={800}>{player.player}</Text>
+                      transition: "transform 0.2s ease-in-out",
+                      transformOrigin: "center",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.transform = "scale(0.98)")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.transform = "scale(1)")
+                    }
+                  >
+                    <Box pos="absolute" top="0" left="0">
+                      {index === 1 && (
+                        <IconCircleNumber1Filled size="30" color="#D6AF36" />
+                      )}
+                      {index === 0 && (
+                        <IconCircleNumber2Filled size="30" color="#A7A7AD" />
+                      )}
+                      {index === 2 && (
+                        <IconCircleNumber3Filled size="30" color="#A77044" />
+                      )}
+                    </Box>
+                    <Stack gap="lg" align="center">
+                      <Stack align="center" gap="sm">
+                        <Avatar size="lg" src={player.img} />
+                        <Text fw={800}>{player.player}</Text>
+                      </Stack>
+                      <Stack gap="sm">
+                        <Group
+                          key={`netWins-${player.player}`}
+                          justify="space-between"
+                          gap={28}
+                        >
+                          <Text fw={600} w={95} style={{ textAlign: "right" }}>
+                            Net Pts:
+                          </Text>
+                          <Text>{player.netWins}</Text>
+                        </Group>
+                        <Group
+                          key={`grossWins-${player.player}`}
+                          justify="space-between"
+                          gap={28}
+                        >
+                          <Text fw={600} w={95} style={{ textAlign: "right" }}>
+                            Gross Pts:
+                          </Text>
+                          <Text>{player.grossWins}</Text>
+                        </Group>
+                        <Group
+                          key={`netAvg-${player.player}`}
+                          justify="space-between"
+                          gap={28}
+                        >
+                          <Text fw={600} w={95} style={{ textAlign: "right" }}>
+                            Net Avg:
+                          </Text>
+                          <Text>
+                            {netAvg().find(
+                              (avg) => avg.player === player.player
+                            )?.avg ?? "N/A"}
+                          </Text>
+                        </Group>
+                        <Group
+                          key={`grossAvg-${player.player}`}
+                          justify="space-between"
+                          gap={28}
+                        >
+                          <Text fw={600} w={95} style={{ textAlign: "right" }}>
+                            Gross Avg:
+                          </Text>
+                          <Text>
+                            {grossAvg().find(
+                              (avg) => avg.player === player.player
+                            )?.avg ?? "N/A"}
+                          </Text>
+                        </Group>
+                      </Stack>
                     </Stack>
-                    <Stack>
-                      <Group
-                        key={`netWins-${player.player}`}
-                        justify="space-between"
-                        gap={52}
-                      >
-                        <Text fw={600} w={48}>
-                          NPts:
-                        </Text>
-                        <Text>{player.netWins}</Text>
-                      </Group>
-                      <Group
-                        key={`grossWins-${player.player}`}
-                        justify="space-between"
-                        gap={52}
-                      >
-                        <Text fw={600} w={48}>
-                          GPts:
-                        </Text>
-                        <Text>{player.grossWins}</Text>
-                      </Group>
-                      <Group
-                        key={`netAvg-${player.player}`}
-                        justify="space-between"
-                        gap={52}
-                      >
-                        <Text fw={600} w={48}>
-                          NAvg:
-                        </Text>
-                        <Text>
-                          {netAvg().find((avg) => avg.player === player.player)
-                            ?.avg ?? "N/A"}
-                        </Text>
-                      </Group>
-                      <Group
-                        key={`grossAvg-${player.player}`}
-                        justify="space-between"
-                        gap={52}
-                      >
-                        <Text fw={600} w={48}>
-                          GAvg:
-                        </Text>
-                        <Text>
-                          {grossAvg().find(
-                            (avg) => avg.player === player.player
-                          )?.avg ?? "N/A"}
-                        </Text>
-                      </Group>
+                  </Card>
+                )
+              )}
+            </Group>
+            <Stack align="end">
+              <Switch
+                checked={netSwitch}
+                label={netSwitch ? "Net Rankings" : "Gross Rankings"}
+                onChange={(event) => setNetSwitch(event.currentTarget.checked)}
+              />
+            </Stack>
+          </Stack>
+        ) : (
+          <Stack>
+            <Stack align="center">
+              <Switch
+                checked={netSwitch}
+                label={netSwitch ? "Net Rankings" : "Gross Rankings"}
+                onChange={(event) => setNetSwitch(event.currentTarget.checked)}
+              />
+            </Stack>
+            <Stack align="center" justify="center">
+              {players
+                .sort((a, b) => b.netWins - a.netWins)
+                .map((player, index) => (
+                  <Card
+                    shadow="sm"
+                    padding="lg"
+                    radius="lg"
+                    withBorder
+                    w={260}
+                    h={300}
+                    key={player.player}
+                    style={{
+                      boxShadow:
+                        index === 0
+                          ? "0 0 12px rgba(255, 215, 0, 0.6)"
+                          : index === 1
+                          ? "0 0 12px rgba(167, 167, 173, 0.6)"
+                          : index === 2
+                          ? "0 0 12px rgba(167, 112, 68, 0.6)"
+                          : "none",
+
+                      transition: "transform 0.2s ease-in-out",
+                      transformOrigin: "center",
+                    }}
+                    onMouseEnter={(e) =>
+                      (e.currentTarget.style.transform = "scale(0.98)")
+                    }
+                    onMouseLeave={(e) =>
+                      (e.currentTarget.style.transform = "scale(1)")
+                    }
+                  >
+                    <Box pos="absolute" top="0" left="0">
+                      {index === 0 && (
+                        <IconCircleNumber1Filled size="30" color="#D6AF36" />
+                      )}
+                      {index === 1 && (
+                        <IconCircleNumber2Filled size="30" color="#A7A7AD" />
+                      )}
+                      {index === 2 && (
+                        <IconCircleNumber3Filled size="30" color="#A77044" />
+                      )}
+                    </Box>
+                    <Stack gap="lg" align="center">
+                      <Stack align="center" gap="sm">
+                        <Avatar size="lg" src={player.img} />
+                        <Text fw={800}>{player.player}</Text>
+                      </Stack>
+                      <Stack>
+                        <Group
+                          key={`netWins-${player.player}`}
+                          justify="space-between"
+                          gap={52}
+                        >
+                          <Text fw={600} w={95} style={{ textAlign: "right" }}>
+                            Net Pts:
+                          </Text>
+                          <Text>{player.netWins}</Text>
+                        </Group>
+                        <Group
+                          key={`grossWins-${player.player}`}
+                          justify="space-between"
+                          gap={52}
+                        >
+                          <Text fw={600} w={95} style={{ textAlign: "right" }}>
+                            Gross Pts:
+                          </Text>
+                          <Text>{player.grossWins}</Text>
+                        </Group>
+                        <Group
+                          key={`netAvg-${player.player}`}
+                          justify="space-between"
+                          gap={52}
+                        >
+                          <Text fw={600} w={95} style={{ textAlign: "right" }}>
+                            Net Avg:
+                          </Text>
+                          <Text>
+                            {netAvg().find(
+                              (avg) => avg.player === player.player
+                            )?.avg ?? "N/A"}
+                          </Text>
+                        </Group>
+                        <Group
+                          key={`grossAvg-${player.player}`}
+                          justify="space-between"
+                          gap={52}
+                        >
+                          <Text fw={600} w={95} style={{ textAlign: "right" }}>
+                            Gross Avg:
+                          </Text>
+                          <Text>
+                            {grossAvg().find(
+                              (avg) => avg.player === player.player
+                            )?.avg ?? "N/A"}
+                          </Text>
+                        </Group>
+                      </Stack>
                     </Stack>
-                  </Stack>
-                </Card>
-              ))}
+                  </Card>
+                ))}
+            </Stack>
           </Stack>
         )}
       </Stack>
