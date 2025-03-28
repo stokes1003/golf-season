@@ -1,16 +1,8 @@
-import {
-  Stack,
-  Text,
-  Card,
-  Group,
-  Avatar,
-  Image,
-  Button,
-  Modal,
-} from "@mantine/core";
+import { Stack, Text, Group, Button, Modal, ScrollArea } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import React, { useState } from "react";
-import { useGetPlayers, useGetGolfCourses, useGetScores } from "../hooks";
+import { useGetScores } from "../hooks";
+import { RoundsCard } from "./RoundsCard";
 
 export const OfficialRounds = ({
   updateScores,
@@ -19,11 +11,10 @@ export const OfficialRounds = ({
   setUpdatePlayers,
 }) => {
   const allScores = useGetScores(setUpdatePlayers, updateScores);
-  const players = useGetPlayers(updatePlayers);
-  const golfCourses = useGetGolfCourses(updateScores);
+
   const [deleteRoundId, setDeleteRoundId] = useState<string | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
-  const isMobile = useMediaQuery("(max-width: 500px)");
+  const isMobile = useMediaQuery("(max-width: 600px)");
 
   const openModal = (roundId: string) => {
     setDeleteRoundId(roundId);
@@ -52,98 +43,38 @@ export const OfficialRounds = ({
   return (
     <Stack gap="lg" align="center">
       <Text fw={900}>Official Rounds</Text>
-      <Stack gap="lg">
-        {allScores.map((round) => (
-          <Card
-            key={round._id.toString()}
-            shadow="lg"
-            pb="lg"
-            radius="lg"
-            withBorder
-            w={352}
-            onClick={() =>
-              setDeleteRoundId((prev) =>
-                prev === round._id.toString() ? null : round._id.toString()
-              )
-            }
-            style={{
-              transition: "transform 0.2s ease-in-out",
-              transformOrigin: "center",
-              cursor: "pointer",
-            }}
-            onMouseEnter={(e) => {
-              e.currentTarget.style.transform = "scale(0.98)";
-            }}
-            onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
-          >
-            <Stack align="center">
-              <Card.Section>
-                <Image
-                  w={352}
-                  h={200}
-                  src={
-                    golfCourses.find((c) => c.courseName === round.course)?.img
-                  }
-                />
-              </Card.Section>
-              <Stack gap="xs" align="center">
-                <Text fw={800}>{round.course}</Text>
-                <Text>{new Date(round.date).toLocaleDateString()}</Text>
-              </Stack>
-              <Stack align="center">
-                <Group gap={52}>
-                  <Text fw={600} w={40} style={{ textAlign: "center" }}>
-                    PLR
-                  </Text>
-                  <Text fw={600} w={32} style={{ textAlign: "center" }}>
-                    GRS
-                  </Text>
-                  <Text fw={600} w={32} style={{ textAlign: "center" }}>
-                    NET
-                  </Text>
-                  <Text fw={600} w={32} style={{ textAlign: "center" }}>
-                    HCP
-                  </Text>
-                </Group>
-                {round.scores
-                  .slice()
-                  .sort((a, b) => a.net - b.net)
-                  .map((player) => (
-                    <Group key={player.player} gap={52}>
-                      <Avatar
-                        src={
-                          players.find((p) => p.player === player.player)
-                            ?.img || ""
-                        }
-                        w={40}
-                      />
-                      <Text w={32} style={{ textAlign: "center" }}>
-                        {player.gross}
-                      </Text>
-                      <Text w={32} style={{ textAlign: "center" }}>
-                        {player.net}
-                      </Text>
-                      <Text w={32} style={{ textAlign: "center" }}>
-                        {player.hcp}
-                      </Text>
-                    </Group>
-                  ))}
-              </Stack>
-              {deleteRoundId === round._id.toString() && (
-                <Button
-                  w={150}
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openModal(round._id.toString());
-                  }}
-                >
-                  Delete Round
-                </Button>
-              )}
-            </Stack>
-          </Card>
-        ))}
-      </Stack>
+      {!isMobile ? (
+        <Stack gap="lg">
+          {allScores.map((round) => (
+            <RoundsCard
+              key={round._id.toString()}
+              updatePlayers={updatePlayers}
+              updateScores={updateScores}
+              round={round}
+              deleteRoundId={deleteRoundId}
+              setDeleteRoundId={setDeleteRoundId}
+              openModal={openModal}
+            />
+          ))}
+        </Stack>
+      ) : (
+        <ScrollArea w={400}>
+          <Group wrap="nowrap" gap="lg">
+            {allScores.map((round) => (
+              <RoundsCard
+                key={round._id.toString()}
+                updatePlayers={updatePlayers}
+                updateScores={updateScores}
+                round={round}
+                deleteRoundId={deleteRoundId}
+                setDeleteRoundId={setDeleteRoundId}
+                openModal={openModal}
+              />
+            ))}
+          </Group>
+        </ScrollArea>
+      )}
+
       <Modal
         opened={opened}
         onClose={close}
