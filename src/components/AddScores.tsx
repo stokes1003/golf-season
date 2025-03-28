@@ -15,34 +15,29 @@ import {
   useGetPlayers,
   usePostScores,
   useUpdateWinners,
+  useGetScores,
 } from "../hooks";
 import { IconX, IconArrowNarrowLeft } from "@tabler/icons-react";
 
-export const AddScores = ({
-  setIsLeaderboard,
-  updateScores,
-  setUpdateScores,
-  updatePlayers,
-}) => {
-  const golfCourses = useGetGolfCourses(updateScores);
+export const AddScores = ({ setIsLeaderboard }) => {
+  const golfCourses = useGetGolfCourses();
   const [golfCourse, setGolfCourse] = useState<string | null>(null);
-  const [isScore, setIsScore] = useState(false);
-  const [isGolfCourse, setIsGolfCourse] = useState(true);
+  const [currentStep, setCurrentStep] = useState("selectGolfCourse");
   const updateWinners = useUpdateWinners();
   const postScores = usePostScores();
-  const golfers = useGetPlayers(updatePlayers);
+  const { players, fetchPlayers } = useGetPlayers();
+  const { fetchScores } = useGetScores();
+  const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
 
-  const [playerCounter, setPlayerCounter] = useState(0);
-
-  const [playerScores, setPlayerScores] = useState([
+  const [scoresByPlayer, setScoresByPlayer] = useState([
     { player: "Travis", gross: "", hcp: "" },
     { player: "Stokes", gross: "", hcp: "" },
     { player: "JP", gross: "", hcp: "" },
   ]);
 
   const handleSubmitScores = async () => {
-    const gross = parseInt(playerScores[playerCounter].gross, 10);
-    const handicap = parseInt(playerScores[playerCounter].hcp, 10);
+    const gross = parseInt(scoresByPlayer[currentPlayerIndex].gross, 10);
+    const handicap = parseInt(scoresByPlayer[currentPlayerIndex].hcp, 10);
 
     if (
       isNaN(gross) ||
@@ -58,12 +53,12 @@ export const AddScores = ({
       return;
     }
 
-    if (playerCounter === 2) {
+    if (currentPlayerIndex === players.length - 1) {
       setIsLeaderboard(true);
       await postScores({
         course: golfCourse!,
         date: new Date(),
-        scores: playerScores.map((player) => ({
+        scores: scoresByPlayer.map((player) => ({
           player: player.player,
           gross: parseInt(player.gross, 10),
           hcp: parseInt(player.hcp, 10),
@@ -71,18 +66,20 @@ export const AddScores = ({
         })),
       });
       await updateWinners({
-        scores: playerScores.map((player) => ({
+        scores: scoresByPlayer.map((player) => ({
           player: player.player,
           gross: parseInt(player.gross, 10),
           hcp: parseInt(player.hcp, 10),
           net: parseInt(player.gross, 10) - parseInt(player.hcp, 10),
         })),
       });
-      setPlayerCounter(0);
-      setIsScore((prev) => !prev);
-      setUpdateScores((prev: number) => prev + 1);
+      await fetchScores();
+      await fetchPlayers();
+
+      setCurrentPlayerIndex(0);
+      setCurrentStep("selectGolfCourse");
     } else {
-      setPlayerCounter((prev) => prev + 1);
+      setCurrentPlayerIndex((prev) => prev + 1);
     }
   };
 
@@ -92,7 +89,8 @@ export const AddScores = ({
         <Title>Fairway Fleas</Title>
         <Title order={3}>Add A Score</Title>
       </Stack>
-      {isGolfCourse && (
+
+      {currentStep === "selectGolfCourse" && (
         <Stack align="end">
           <Box
             h={24}
@@ -116,7 +114,7 @@ export const AddScores = ({
         </Stack>
       )}
 
-      {isScore && (
+      {currentStep === "enterPlayerScores" && (
         <Group justify="space-between">
           <Box
             h={24}
@@ -133,10 +131,9 @@ export const AddScores = ({
               stroke={1}
               cursor={"pointer"}
               onClick={() => {
-                if (playerCounter === 0) {
-                  setIsScore((prev) => !prev);
-                  setIsGolfCourse((prev) => !prev);
-                } else setPlayerCounter((prev) => prev - 1);
+                if (currentPlayerIndex === 0) {
+                  setCurrentStep("selectGolfCourse");
+                } else setCurrentPlayerIndex((prev) => prev - 1);
               }}
             />
           </Box>
@@ -155,8 +152,7 @@ export const AddScores = ({
               stroke={1}
               cursor={"pointer"}
               onClick={() => {
-                setIsScore((prev) => !prev);
-
+                setCurrentStep("selectGolfCourse");
                 setIsLeaderboard(true);
               }}
             />
@@ -164,7 +160,7 @@ export const AddScores = ({
         </Group>
       )}
 
-      {isGolfCourse && (
+      {currentStep === "selectGolfCourse" && (
         <Stack gap="md" align="center">
           <Stack gap="xs">
             <Text fw={600}> Select Golf Course</Text>
@@ -185,8 +181,7 @@ export const AddScores = ({
               if (golfCourse === null) {
                 alert("Please select a golf course");
               } else {
-                setIsScore((prev) => !prev);
-                setIsGolfCourse((prev) => !prev);
+                setCurrentStep("enterPlayerScores");
               }
             }}
           >
@@ -195,39 +190,45 @@ export const AddScores = ({
         </Stack>
       )}
 
-      {isScore && (
+      {currentStep === "enterPlayerScores" && (
         <Stack align="center">
           <Group>
-            <Stack key={golfers[playerCounter].player} align="center" gap="xs">
+            <Stack
+              key={players[currentPlayerIndex].player}
+              align="center"
+              gap="xs"
+            >
               <Group gap="xs">
-                <Avatar src={golfers[playerCounter].img} size="sm" />
-                <Text fw={700}>{golfers[playerCounter].player}</Text>
+                <Avatar src={players[currentPlayerIndex].img} size="sm" />
+                <Text fw={700}>{players[currentPlayerIndex].player}</Text>
               </Group>
 
               <Input
-                placeholder={`${golfers[playerCounter].player}'s HCP`}
+                placeholder={`${players[currentPlayerIndex].player}'s HCP`}
                 w={200}
-                value={playerScores[playerCounter].hcp}
+                value={scoresByPlayer[currentPlayerIndex].hcp}
                 onChange={(e) => {
-                  const updatedScores = [...playerScores];
-                  updatedScores[playerCounter].hcp = e.target.value;
-                  setPlayerScores(updatedScores);
+                  const updatedScores = [...scoresByPlayer];
+                  updatedScores[currentPlayerIndex].hcp = e.target.value;
+                  setScoresByPlayer(updatedScores);
                 }}
               />
               <Input
-                placeholder={`${golfers[playerCounter].player}'s Gross`}
+                placeholder={`${players[currentPlayerIndex].player}'s Gross`}
                 w={200}
-                value={playerScores[playerCounter].gross}
+                value={scoresByPlayer[currentPlayerIndex].gross}
                 onChange={(e) => {
-                  const updatedScores = [...playerScores];
-                  updatedScores[playerCounter].gross = e.target.value;
-                  setPlayerScores(updatedScores);
+                  const updatedScores = [...scoresByPlayer];
+                  updatedScores[currentPlayerIndex].gross = e.target.value;
+                  setScoresByPlayer(updatedScores);
                 }}
               />
             </Stack>
           </Group>
           <Button w={150} onClick={handleSubmitScores}>
-            {playerCounter === 2 ? "Submit Scores" : "Next Player"}
+            {currentPlayerIndex === players.length - 1
+              ? "Submit Scores"
+              : "Next Player"}
           </Button>
         </Stack>
       )}

@@ -30,7 +30,14 @@ export function HeaderMenu({ setIsLeaderboard }) {
   ));
 
   return (
-    <header className={classes.header}>
+    <header
+      className={classes.header}
+      style={{
+        position: "sticky",
+        top: 0,
+        zIndex: 100,
+      }}
+    >
       <Container size="md">
         <Box className={classes.inner}>
           <Group align="center" justify="space-between" w="100%">

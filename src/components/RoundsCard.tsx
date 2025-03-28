@@ -3,15 +3,13 @@ import { Card, Stack, Text, Group, Avatar, Image, Button } from "@mantine/core";
 import { useGetGolfCourses, useGetPlayers } from "../hooks";
 
 export const RoundsCard = ({
-  updatePlayers,
-  updateScores,
   round,
   deleteRoundId,
   setDeleteRoundId,
   openModal,
 }) => {
-  const players = useGetPlayers(updatePlayers);
-  const golfCourses = useGetGolfCourses(updateScores);
+  const { players } = useGetPlayers();
+  const golfCourses = useGetGolfCourses();
   return (
     <>
       <Card

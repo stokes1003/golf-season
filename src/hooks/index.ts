@@ -57,7 +57,7 @@ export function usePostScores() {
   return postScores;
 }
 
-export function useGetGolfCourses(updateScores: number) {
+export function useGetGolfCourses() {
   const [golfCourses, setGolfCourses] = useState<GolfCourse[]>([]);
 
   useEffect(() => {
@@ -71,35 +71,34 @@ export function useGetGolfCourses(updateScores: number) {
       }
     };
     fetchGolfCourses();
-  }, [updateScores]);
+  }, []);
 
   return golfCourses;
 }
 
-export function useGetScores(
-  setUpdatePlayers: React.Dispatch<React.SetStateAction<number>>,
-  updateScores: number
-) {
-  const [allScores, setAllScores] = useState<AllScores[]>([]);
+export function useGetScores() {
+  const [scores, setScores] = useState<AllScores[]>([]);
+  const fetchScores = async () => {
+    try {
+      const response = await fetch("/.netlify/functions/getScores");
+      const data = await response.json();
+      const sortedScores = data.sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+      setScores(sortedScores);
+    } catch (error) {
+      console.error("Error fetching scores:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchScores = async () => {
-      try {
-        const response = await fetch("/.netlify/functions/getScores");
-        const data = await response.json();
-        const sortedScores = data.sort(
-          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-        );
-        setAllScores(sortedScores);
-        setUpdatePlayers((prev) => prev + 1);
-      } catch (error) {
-        console.error("Error fetching scores:", error);
-      }
+    const getScores = async () => {
+      await fetchScores();
     };
-    fetchScores();
-  }, [updateScores]);
+    getScores();
+  }, []);
 
-  return allScores;
+  return { scores, fetchScores };
 }
 
 export function useUpdateWinners() {
@@ -143,22 +142,24 @@ export function useUpdateWinners() {
   return updateWinners;
 }
 
-export function useGetPlayers(updatePlayers: number) {
+export function useGetPlayers() {
   const [players, setPlayers] = useState<Player[]>([]);
+  const fetchPlayers = async () => {
+    try {
+      const response = await fetch("/.netlify/functions/getPlayers");
+      const data = await response.json();
+      setPlayers(data);
+    } catch (error) {
+      console.error("Error fetching players:", error);
+    }
+  };
 
   useEffect(() => {
-    const fetchPlayers = async () => {
-      try {
-        const response = await fetch("/.netlify/functions/getPlayers");
-        const data = await response.json();
-        setPlayers(data);
-      } catch (error) {
-        console.error("Error fetching players:", error);
-      }
+    const getPlayers = async () => {
+      await fetchPlayers();
     };
-    fetchPlayers();
-    console.log("Players updated");
-  }, [updatePlayers]);
+    getPlayers();
+  }, []);
 
-  return players;
+  return { players, fetchPlayers };
 }
