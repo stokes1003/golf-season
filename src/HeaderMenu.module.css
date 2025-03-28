@@ -37,7 +37,7 @@
 
 .mobileMenu {
   position: absolute;
-  top: 56px; /* Aligns it below the header */
+  top: 56px;
   right: 0;
   width: 100%;
   background-color: var(--mantine-color-body);

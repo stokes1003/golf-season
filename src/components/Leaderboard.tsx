@@ -8,6 +8,7 @@ import {
   Title,
   Tooltip,
   Switch,
+  Tabs,
 } from "@mantine/core";
 import React, { useState } from "react";
 import { useGetPlayers, useGetScores } from "../hooks";
@@ -169,6 +170,18 @@ export const Leaderboard = ({
           />
         </Tooltip>
       </Group>
+      <Stack align="center">
+        <Tabs defaultValue="Net">
+          <Tabs.List justify="flex-end">
+            <Tabs.Tab value="Net" onClick={() => setNetSwitch(true)}>
+              Net
+            </Tabs.Tab>
+            <Tabs.Tab value="Gross" onClick={() => setNetSwitch(false)}>
+              Gross
+            </Tabs.Tab>
+          </Tabs.List>
+        </Tabs>
+      </Stack>
       <Stack>
         {!isMobile ? (
           <Stack gap="lg">
@@ -233,30 +246,30 @@ export const Leaderboard = ({
                           <Group
                             key={`netWins-${player.player}`}
                             justify="space-between"
-                            gap={28}
+                            gap={24}
                           >
                             <Text
                               fw={600}
-                              w={95}
+                              w={60}
                               style={{ textAlign: "right" }}
                             >
-                              Net Pts:
+                              Points
                             </Text>
-                            <Text>{player.netWins}</Text>
+                            <Text w={60}>{player.netWins}</Text>
                           </Group>
                           <Group
                             key={`netAvg-${player.player}`}
                             justify="space-between"
-                            gap={28}
+                            gap={24}
                           >
                             <Text
                               fw={600}
-                              w={95}
+                              w={60}
                               style={{ textAlign: "right" }}
                             >
-                              Net Avg:
+                              AVG
                             </Text>
-                            <Text>
+                            <Text w={60}>
                               {netAvg().find(
                                 (avg) => avg.player === player.player
                               )?.avg ?? "N/A"}
@@ -265,16 +278,16 @@ export const Leaderboard = ({
                           <Group
                             key={`bestNet-${player.player}`}
                             justify="space-between"
-                            gap={28}
+                            gap={24}
                           >
                             <Text
                               fw={600}
-                              w={95}
+                              w={60}
                               style={{ textAlign: "right" }}
                             >
-                              Best Net:
+                              Best
                             </Text>
-                            <Text>
+                            <Text w={60}>
                               {bestNet().find(
                                 (avg) => avg.player === player.player
                               )?.bestNet ?? "N/A"}
@@ -286,31 +299,31 @@ export const Leaderboard = ({
                           <Group
                             key={`grossWins-${player.player}`}
                             justify="space-between"
-                            gap={28}
+                            gap={24}
                           >
                             <Text
                               fw={600}
-                              w={95}
+                              w={60}
                               style={{ textAlign: "right" }}
                             >
-                              Gross Pts:
+                              Points
                             </Text>
-                            <Text>{player.grossWins}</Text>
+                            <Text w={60}>{player.grossWins}</Text>
                           </Group>
 
                           <Group
                             key={`grossAvg-${player.player}`}
                             justify="space-between"
-                            gap={28}
+                            gap={24}
                           >
                             <Text
                               fw={600}
-                              w={95}
+                              w={60}
                               style={{ textAlign: "right" }}
                             >
-                              Gross Avg:
+                              AVG
                             </Text>
-                            <Text>
+                            <Text w={60}>
                               {grossAvg().find(
                                 (avg) => avg.player === player.player
                               )?.avg ?? "N/A"}
@@ -319,16 +332,16 @@ export const Leaderboard = ({
                           <Group
                             key={`bestGross-${player.player}`}
                             justify="space-between"
-                            gap={28}
+                            gap={24}
                           >
                             <Text
                               fw={600}
-                              w={95}
+                              w={60}
                               style={{ textAlign: "right" }}
                             >
-                              Best Gross:
+                              Best
                             </Text>
-                            <Text>
+                            <Text w={60}>
                               {bestGross().find(
                                 (avg) => avg.player === player.player
                               )?.bestGross ?? "N/A"}
@@ -341,23 +354,9 @@ export const Leaderboard = ({
                 )
               )}
             </Group>
-            <Stack align="end">
-              <Switch
-                checked={netSwitch}
-                label={netSwitch ? "Net Rankings" : "Gross Rankings"}
-                onChange={(event) => setNetSwitch(event.currentTarget.checked)}
-              />
-            </Stack>
           </Stack>
         ) : (
           <Stack>
-            <Stack align="center">
-              <Switch
-                checked={netSwitch}
-                label={netSwitch ? "Net Rankings" : "Gross Rankings"}
-                onChange={(event) => setNetSwitch(event.currentTarget.checked)}
-              />
-            </Stack>
             <Stack align="center" justify="center">
               {players
                 .sort((a, b) => {
@@ -416,7 +415,7 @@ export const Leaderboard = ({
                             <Group
                               key={`netWins-${player.player}`}
                               justify="space-between"
-                              gap={52}
+                              gap={24}
                             >
                               <Text
                                 fw={600}
@@ -430,7 +429,7 @@ export const Leaderboard = ({
                             <Group
                               key={`netAvg-${player.player}`}
                               justify="space-between"
-                              gap={52}
+                              gap={24}
                             >
                               <Text
                                 fw={600}
@@ -448,7 +447,7 @@ export const Leaderboard = ({
                             <Group
                               key={`bestNet-${player.player}`}
                               justify="space-between"
-                              gap={52}
+                              gap={24}
                             >
                               <Text
                                 fw={600}
@@ -469,7 +468,7 @@ export const Leaderboard = ({
                             <Group
                               key={`grossWins-${player.player}`}
                               justify="space-between"
-                              gap={52}
+                              gap={24}
                             >
                               <Text
                                 fw={600}
@@ -484,7 +483,7 @@ export const Leaderboard = ({
                             <Group
                               key={`grossAvg-${player.player}`}
                               justify="space-between"
-                              gap={52}
+                              gap={24}
                             >
                               <Text
                                 fw={600}
@@ -502,7 +501,7 @@ export const Leaderboard = ({
                             <Group
                               key={`bestGross-${player.player}`}
                               justify="space-between"
-                              gap={52}
+                              gap={24}
                             >
                               <Text
                                 fw={600}
