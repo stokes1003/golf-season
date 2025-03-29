@@ -17,8 +17,8 @@ export type AllScores = {
 
 export type Player = {
   player: string;
-  netWins: number;
-  grossWins: number;
+  netPoints: number;
+  grossPoints: number;
   img: string;
   _id: ObjectId;
 };
@@ -86,6 +86,7 @@ export function useGetScores() {
         (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
       );
       setScores(sortedScores);
+      console.log("Scores fetched successfully:", sortedScores);
     } catch (error) {
       console.error("Error fetching scores:", error);
     }
@@ -101,23 +102,64 @@ export function useGetScores() {
   return { scores, fetchScores };
 }
 
-export function useUpdateWinners() {
-  const updateWinners = async (round) => {
-    const netMin = Math.min(...round.scores.map((s) => s.net));
-    const netWinners = round.scores.filter((s) => s.net === netMin);
+export function useUpdatePlayerPoints() {
+  const updatePlayerPoints = async (round) => {
+    const calculatePoints = (scores) => {
+      const sortedScores = scores
+        .map((s) => ({ player: s.player, score: s.score }))
+        .sort((a, b) => a.score - b.score);
 
-    const grossMin = Math.min(...round.scores.map((s) => s.gross));
-    const grossWinners = round.scores.filter((s) => s.gross === grossMin);
+      const scoreValues = sortedScores.map((s) => s.score);
+      const uniqueScores = new Set(scoreValues);
+      const allPlayersTied = uniqueScores.size === 1;
+
+      let points = {};
+
+      if (allPlayersTied) {
+        sortedScores.forEach((s) => {
+          points[s.player] = 10;
+        });
+      } else if (uniqueScores.size === scoreValues.length) {
+        points[sortedScores[0].player] = 20;
+        points[sortedScores[1].player] = 10;
+        points[sortedScores[2].player] = 0;
+      } else if (scoreValues[0] === scoreValues[1]) {
+        points[sortedScores[0].player] = 15;
+        points[sortedScores[1].player] = 15;
+        points[sortedScores[2].player] = 0;
+      } else if (scoreValues[1] === scoreValues[2]) {
+        points[sortedScores[0].player] = 20;
+        points[sortedScores[1].player] = 5;
+        points[sortedScores[2].player] = 5;
+      }
+
+      return points;
+    };
+
+    const netScores = round.scores.map((s) => ({
+      player: s.player,
+      score: s.net,
+    }));
+    const grossScores = round.scores.map((s) => ({
+      player: s.player,
+      score: s.gross,
+    }));
+
+    const netPoints = calculatePoints(netScores);
+    const grossPoints = calculatePoints(grossScores);
+
+    console.log("Net Points:", netPoints);
+    console.log("Gross Points:", grossPoints);
 
     try {
-      const response = await fetch("/.netlify/functions/updatePlayerWins", {
+      const response = await fetch("/.netlify/functions/updatePlayerPoints", {
         method: "PATCH",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          netWinners: netWinners.map((w) => w.player),
-          grossWinners: grossWinners.map((w) => w.player),
+          netPoints,
+          grossPoints,
         }),
       });
 
@@ -131,15 +173,12 @@ export function useUpdateWinners() {
       }
 
       const data = await response.json();
-      if (data) {
-        console.log("Winners updated successfully:", data);
-      }
     } catch (error) {
       console.error("Error updating winners:", error);
     }
   };
 
-  return updateWinners;
+  return updatePlayerPoints;
 }
 
 export function useGetPlayers() {

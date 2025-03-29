@@ -10,7 +10,7 @@ export const OfficialRounds = ({}) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteRoundId, setDeleteRoundId] = useState<string | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
-  const isMobile = useMediaQuery("(max-width: 600px)");
+  const isMobile = useMediaQuery("(max-width: 420px)");
 
   const openModal = (roundId: string) => {
     setDeleteRoundId(roundId);
@@ -57,8 +57,8 @@ export const OfficialRounds = ({}) => {
           ))}
         </Stack>
       ) : (
-        <ScrollArea w={400}>
-          <Group wrap="nowrap" gap="lg">
+        <ScrollArea w={420}>
+          <Group wrap="nowrap" gap="lg" mx="lg" grow>
             {scores.map((round) => (
               <RoundsCard
                 key={round._id.toString()}

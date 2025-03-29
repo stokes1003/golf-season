@@ -14,7 +14,7 @@ import {
   useGetGolfCourses,
   useGetPlayers,
   usePostScores,
-  useUpdateWinners,
+  useUpdatePlayerPoints,
   useGetScores,
 } from "../hooks";
 import { IconX, IconArrowNarrowLeft } from "@tabler/icons-react";
@@ -23,7 +23,7 @@ export const AddScores = ({ setIsLeaderboard }) => {
   const golfCourses = useGetGolfCourses();
   const [golfCourse, setGolfCourse] = useState<string | null>(null);
   const [currentStep, setCurrentStep] = useState("selectGolfCourse");
-  const updateWinners = useUpdateWinners();
+  const updatePlayerPoints = useUpdatePlayerPoints();
   const postScores = usePostScores();
   const { players, fetchPlayers } = useGetPlayers();
   const { fetchScores } = useGetScores();
@@ -65,7 +65,7 @@ export const AddScores = ({ setIsLeaderboard }) => {
           net: parseInt(player.gross, 10) - parseInt(player.hcp, 10),
         })),
       });
-      await updateWinners({
+      await updatePlayerPoints({
         scores: scoresByPlayer.map((player) => ({
           player: player.player,
           gross: parseInt(player.gross, 10),

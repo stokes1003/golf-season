@@ -1,6 +1,7 @@
 import React from "react";
 import { Card, Stack, Text, Group, Avatar, Image, Button } from "@mantine/core";
 import { useGetGolfCourses, useGetPlayers } from "../hooks";
+import { useMediaQuery } from "@mantine/hooks";
 
 export const RoundsCard = ({
   round,
@@ -10,6 +11,7 @@ export const RoundsCard = ({
 }) => {
   const { players } = useGetPlayers();
   const golfCourses = useGetGolfCourses();
+  const isMobile = useMediaQuery("(max-width: 782px)");
   return (
     <>
       <Card
@@ -17,7 +19,7 @@ export const RoundsCard = ({
         pb="lg"
         radius="lg"
         withBorder
-        w={352}
+        w={isMobile ? 344 : 352}
         onClick={() =>
           setDeleteRoundId((prev) =>
             prev === round._id.toString() ? null : round._id.toString()
@@ -46,7 +48,7 @@ export const RoundsCard = ({
             <Text>{new Date(round.date).toLocaleDateString()}</Text>
           </Stack>
           <Stack align="center">
-            <Group gap={52}>
+            <Group gap={48}>
               <Text fw={600} w={40} style={{ textAlign: "center" }}>
                 PLR
               </Text>
@@ -64,7 +66,7 @@ export const RoundsCard = ({
               .slice()
               .sort((a, b) => a.net - b.net)
               .map((player) => (
-                <Group key={player.player} gap={52}>
+                <Group key={player.player} gap={48}>
                   <Avatar
                     src={
                       players.find((p) => p.player === player.player)?.img || ""

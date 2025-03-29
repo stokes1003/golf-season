@@ -16,7 +16,7 @@ const handler: Handler = async (event) => {
     await client.connect();
     const scores = event.body ? JSON.parse(event.body) : null;
 
-    if (!scores || !scores.grossWinners || !scores.netWinners) {
+    if (!scores || !scores.grossPoints || !scores.netPoints) {
       return {
         statusCode: 400,
         body: JSON.stringify({ message: "Invalid request data" }),
@@ -26,20 +26,19 @@ const handler: Handler = async (event) => {
     const db = client.db("fairway-fleas");
     const playersCollection = db.collection("players");
 
-    const grossIncrement = scores.grossWinners.length === 1 ? 3 : 1;
-    const netIncrement = scores.netWinners.length === 1 ? 3 : 1;
-
-    for (const winner of scores.grossWinners) {
+    for (const [player, points] of Object.entries(scores.grossPoints)) {
+      const incrementValue = typeof points === "number" ? points : 0;
       await playersCollection.updateOne(
-        { player: winner },
-        { $inc: { grossWins: grossIncrement } }
+        { player },
+        { $inc: { grossPoints: incrementValue } }
       );
     }
 
-    for (const winner of scores.netWinners) {
+    for (const [player, points] of Object.entries(scores.netPoints)) {
+      const incrementValue = typeof points === "number" ? points : 0;
       await playersCollection.updateOne(
-        { player: winner },
-        { $inc: { netWins: netIncrement } }
+        { player },
+        { $inc: { netPoints: incrementValue } }
       );
     }
 
@@ -48,11 +47,13 @@ const handler: Handler = async (event) => {
 
     return { statusCode: 200, body: JSON.stringify(updatedScores) };
   } catch (error) {
-    console.error(error);
+    console.error("Database connection error:", error);
     return {
       statusCode: 500,
       body: JSON.stringify({ message: "Error connecting to db" }),
     };
+  } finally {
+    await client.close();
   }
 };
 

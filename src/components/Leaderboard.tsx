@@ -18,7 +18,7 @@ export const Leaderboard = ({}) => {
   const [tooltip, setTooltip] = useState(false);
   const [netSwitch, setNetSwitch] = useState(true);
 
-  const isMobile = useMediaQuery("(max-width: 700px)");
+  const isMobile = useMediaQuery("(max-width: 782px)");
 
   return (
     <Stack gap="lg" justify="space-evenly">

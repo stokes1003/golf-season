@@ -9,7 +9,7 @@ import {
 import { useGetPlayers, useGetScores } from "../hooks";
 
 export const PlayerCard = ({ netSwitch }) => {
-  const isMobile = useMediaQuery("(max-width: 700px)");
+  const isMobile = useMediaQuery("(max-width: 782px)");
   const { players } = useGetPlayers();
   const { scores } = useGetScores();
 
@@ -84,8 +84,8 @@ export const PlayerCard = ({ netSwitch }) => {
     const netAvgMap = new Map(netAverages.map((p) => [p.player, p.avg]));
 
     const sorted = [...players].sort((a, b) => {
-      if (b.netWins !== a.netWins) {
-        return b.netWins - a.netWins;
+      if (b.netPoints !== a.netPoints) {
+        return b.netPoints - a.netPoints;
       }
 
       const aNetAvg = netAvgMap.get(a.player) || 0;
@@ -95,7 +95,7 @@ export const PlayerCard = ({ netSwitch }) => {
         return aNetAvg - bNetAvg;
       }
 
-      return b.grossWins - a.grossWins;
+      return b.grossPoints - a.grossPoints;
     });
 
     return isMobile
@@ -107,8 +107,8 @@ export const PlayerCard = ({ netSwitch }) => {
     const grossAvgMap = new Map(grossAverages.map((p) => [p.player, p.avg]));
 
     const sorted = [...players].sort((a, b) => {
-      if (b.grossWins !== a.grossWins) {
-        return b.grossWins - a.grossWins;
+      if (b.grossPoints !== a.grossPoints) {
+        return b.grossPoints - a.grossPoints;
       }
 
       const aGrossAvg = grossAvgMap.get(a.player) || 0;
@@ -118,7 +118,7 @@ export const PlayerCard = ({ netSwitch }) => {
         return aGrossAvg - bGrossAvg;
       }
 
-      return b.netWins - a.netWins;
+      return b.netPoints - a.netPoints;
     });
 
     return isMobile
@@ -149,9 +149,9 @@ export const PlayerCard = ({ netSwitch }) => {
             key={player.player}
             style={{
               boxShadow:
-                index === 1
+                index === (isMobile ? 0 : 1)
                   ? "0 0 12px rgba(255, 215, 0, 0.6)"
-                  : index === 0
+                  : index === (isMobile ? 1 : 0)
                   ? "0 0 12px rgba(167, 167, 173, 0.6)"
                   : index === 2
                   ? "0 0 12px rgba(167, 112, 68, 0.6)"
@@ -166,10 +166,10 @@ export const PlayerCard = ({ netSwitch }) => {
             onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
           >
             <Box pos="absolute" top="0" left="0">
-              {index === 1 && (
+              {index === (isMobile ? 0 : 1) && (
                 <IconCircleNumber1Filled size="30" color="#D6AF36" />
               )}
-              {index === 0 && (
+              {index === (isMobile ? 1 : 0) && (
                 <IconCircleNumber2Filled size="30" color="#A7A7AD" />
               )}
               {index === 2 && (
@@ -192,7 +192,7 @@ export const PlayerCard = ({ netSwitch }) => {
                     Points
                   </Text>
                   <Text w={60}>
-                    {netSwitch ? player.netWins : player.grossWins}
+                    {netSwitch ? player.netPoints : player.grossPoints}
                   </Text>
                 </Group>
                 <Group
