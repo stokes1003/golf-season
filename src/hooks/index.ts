@@ -102,40 +102,40 @@ export function useGetScores() {
   return { scores, fetchScores };
 }
 
+export function calculatePoints(scores) {
+  const sortedScores = scores
+    .map((s) => ({ player: s.player, score: s.score }))
+    .sort((a, b) => a.score - b.score);
+
+  const scoreValues = sortedScores.map((s) => s.score);
+  const uniqueScores = new Set(scoreValues);
+  const allPlayersTied = uniqueScores.size === 1;
+
+  let points = {};
+
+  if (allPlayersTied) {
+    sortedScores.forEach((s) => {
+      points[s.player] = 10;
+    });
+  } else if (uniqueScores.size === scoreValues.length) {
+    points[sortedScores[0].player] = 20;
+    points[sortedScores[1].player] = 10;
+    points[sortedScores[2].player] = 0;
+  } else if (scoreValues[0] === scoreValues[1]) {
+    points[sortedScores[0].player] = 15;
+    points[sortedScores[1].player] = 15;
+    points[sortedScores[2].player] = 0;
+  } else if (scoreValues[1] === scoreValues[2]) {
+    points[sortedScores[0].player] = 20;
+    points[sortedScores[1].player] = 5;
+    points[sortedScores[2].player] = 5;
+  }
+
+  return points;
+}
+
 export function useUpdatePlayerPoints() {
   const updatePlayerPoints = async (round) => {
-    const calculatePoints = (scores) => {
-      const sortedScores = scores
-        .map((s) => ({ player: s.player, score: s.score }))
-        .sort((a, b) => a.score - b.score);
-
-      const scoreValues = sortedScores.map((s) => s.score);
-      const uniqueScores = new Set(scoreValues);
-      const allPlayersTied = uniqueScores.size === 1;
-
-      let points = {};
-
-      if (allPlayersTied) {
-        sortedScores.forEach((s) => {
-          points[s.player] = 10;
-        });
-      } else if (uniqueScores.size === scoreValues.length) {
-        points[sortedScores[0].player] = 20;
-        points[sortedScores[1].player] = 10;
-        points[sortedScores[2].player] = 0;
-      } else if (scoreValues[0] === scoreValues[1]) {
-        points[sortedScores[0].player] = 15;
-        points[sortedScores[1].player] = 15;
-        points[sortedScores[2].player] = 0;
-      } else if (scoreValues[1] === scoreValues[2]) {
-        points[sortedScores[0].player] = 20;
-        points[sortedScores[1].player] = 5;
-        points[sortedScores[2].player] = 5;
-      }
-
-      return points;
-    };
-
     const netScores = round.scores.map((s) => ({
       player: s.player,
       score: s.net,

@@ -1,5 +1,6 @@
 import { Handler } from "@netlify/functions";
 import { MongoClient, ObjectId } from "mongodb";
+import { calculatePoints } from "../../src/hooks";
 import dotenv from "dotenv";
 
 dotenv.config();
@@ -9,6 +10,10 @@ export const client = new MongoClient(uri);
 
 const handler: Handler = async (event) => {
   try {
+    await client.connect();
+    const db = client.db("fairway-fleas");
+
+    // Parse request body
     const score = event.body ? JSON.parse(event.body) : null;
     if (!score || !score._id || !ObjectId.isValid(score._id)) {
       return {
@@ -17,8 +22,7 @@ const handler: Handler = async (event) => {
       };
     }
 
-    const db = client.db("fairway-fleas");
-
+    // Retrieve the round
     const round = await db
       .collection("scores")
       .findOne({ _id: new ObjectId(score._id) });
@@ -30,39 +34,44 @@ const handler: Handler = async (event) => {
       };
     }
 
-    const netWinner = round.scores.reduce((prev, current) =>
-      current.net <= prev.net ? current : prev
-    ).player;
+    // Extract net and gross scores
+    const netScores = round.scores.map((s) => ({
+      player: s.player,
+      score: s.net,
+    }));
+    const grossScores = round.scores.map((s) => ({
+      player: s.player,
+      score: s.gross,
+    }));
 
-    const grossWinner = round.scores.reduce((prev, current) =>
-      current.gross <= prev.gross ? current : prev
-    ).player;
+    // Calculate points
+    const netPoints = calculatePoints(netScores);
+    const grossPoints = calculatePoints(grossScores);
 
     const playersCollection = db.collection("players");
 
-    const grossPlayer = await playersCollection.findOne({
-      player: grossWinner,
-    });
-
-    if (grossPlayer) {
-      const result = await playersCollection.updateOne(
-        { player: grossWinner },
-        { $inc: { grossWins: -1 } }
+    // Decrement previous gross points
+    for (const [player, points] of Object.entries(grossPoints)) {
+      const decrementValue = typeof points === "number" ? points : 0;
+      await playersCollection.updateOne(
+        { player },
+        { $inc: { grossPoints: -decrementValue } } // Ensure correct field name
       );
     }
 
-    const netPlayer = await playersCollection.findOne({ player: netWinner });
-    console.log("Net Player Found:", netPlayer);
-
-    if (netPlayer) {
-      const result = await playersCollection.updateOne(
-        { player: netWinner },
-        { $inc: { netWins: -1 } }
+    // Decrement previous net points
+    for (const [player, points] of Object.entries(netPoints)) {
+      const decrementValue = typeof points === "number" ? points : 0;
+      await playersCollection.updateOne(
+        { player },
+        { $inc: { netPoints: -decrementValue } } // Ensure correct field name
       );
     }
 
+    // Delete the round from scores collection
     await db.collection("scores").deleteOne({ _id: new ObjectId(score._id) });
 
+    // Fetch updated scores
     const updatedScores = await db.collection("scores").find({}).toArray();
 
     return { statusCode: 200, body: JSON.stringify(updatedScores) };
@@ -75,6 +84,8 @@ const handler: Handler = async (event) => {
         error: error.message,
       }),
     };
+  } finally {
+    await client.close();
   }
 };
 
