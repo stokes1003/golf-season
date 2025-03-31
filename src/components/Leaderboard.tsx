@@ -1,14 +1,4 @@
-import {
-  Avatar,
-  Stack,
-  Text,
-  Card,
-  Group,
-  Box,
-  Title,
-  Tooltip,
-  Tabs,
-} from "@mantine/core";
+import { Stack, Text, Group, Title, Tooltip, Tabs } from "@mantine/core";
 import React, { useState } from "react";
 import { useMediaQuery } from "@mantine/hooks";
 import { PlayerCard } from "./PlayerCard";
@@ -17,7 +7,6 @@ import { IconInfoCircle } from "@tabler/icons-react";
 export const Leaderboard = ({}) => {
   const [tooltip, setTooltip] = useState(false);
   const [netSwitch, setNetSwitch] = useState(true);
-
   const isMobile = useMediaQuery("(max-width: 782px)");
 
   return (
@@ -64,9 +53,11 @@ export const Leaderboard = ({}) => {
               <PlayerCard netSwitch={netSwitch} />
             </Stack>
           ) : (
-            <Group gap="lg" style={{ alignItems: "self-end" }}>
-              <PlayerCard netSwitch={netSwitch} />
-            </Group>
+            <Stack>
+              <Group gap="lg" style={{ alignItems: "self-end" }}>
+                <PlayerCard netSwitch={netSwitch} />
+              </Group>
+            </Stack>
           )}
         </Stack>
       </Stack>
