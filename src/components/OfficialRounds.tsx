@@ -57,7 +57,7 @@ export const OfficialRounds = ({}) => {
           ))}
         </Stack>
       ) : (
-        <ScrollArea w="100vw">
+        <ScrollArea w="100vw" type="never">
           <Group wrap="nowrap" gap="lg" mx="lg" grow>
             {scores.map((round) => (
               <RoundsCard
