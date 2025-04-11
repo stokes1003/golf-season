@@ -45,10 +45,10 @@ export const AddScores = ({ setIsLeaderboard }) => {
       gross < 50 ||
       gross > 150 ||
       handicap < 0 ||
-      handicap > 45
+      handicap > 54
     ) {
       alert(
-        "Invalid scores! Gross should be between 50-150, Handicap should be between 0-45."
+        "Invalid scores! Gross should be between 50-150, Handicap should be between 0-54."
       );
       return;
     }
