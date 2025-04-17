@@ -18,19 +18,24 @@ interface CourseStats {
   };
 }
 
+interface CourseAverageData {
+  course: string;
+  [key: string]: string | number | null;
+}
+
 // Fixed colors for each player, matching other charts
 const PLAYER_COLORS = {
   Travis: "#FF6B6B", // Red
   Stokes: "#40C057", // Green
   JP: "#228BE6", // Light Blue
-};
+} as const;
 
 export const CourseAverages = ({ netSwitch }: { netSwitch: boolean }) => {
   const { scores } = useGetScores();
   const { players } = useGetPlayers();
   const isMobile = useMediaQuery("(max-width: 782px)");
 
-  const getCourseAverages = () => {
+  const getCourseAverages = (): CourseAverageData[] => {
     if (!scores || !players) return [];
 
     // Create a map to store total scores and count for each course
@@ -57,7 +62,7 @@ export const CourseAverages = ({ netSwitch }: { netSwitch: boolean }) => {
 
     // Calculate averages for each course
     return Array.from(courseData.values()).map((courseStats) => {
-      const data = {
+      const data: CourseAverageData = {
         course: courseStats.courseName,
       };
 
@@ -79,7 +84,7 @@ export const CourseAverages = ({ netSwitch }: { netSwitch: boolean }) => {
   // Create series for each player
   const series = players.map((player) => ({
     name: player.player,
-    color: PLAYER_COLORS[player.player],
+    color: PLAYER_COLORS[player.player as keyof typeof PLAYER_COLORS],
   }));
 
   return (
