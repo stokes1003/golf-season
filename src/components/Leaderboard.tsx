@@ -1,12 +1,11 @@
-import { Stack, Text, Group, Title, Tooltip, Tabs } from "@mantine/core";
+import { Stack, Text, Group, Title, Modal, Tabs, Button } from "@mantine/core";
 import React, { useState } from "react";
 import { useMediaQuery } from "@mantine/hooks";
 import { PlayerCard } from "./PlayerCard";
 import { IconInfoCircle } from "@tabler/icons-react";
 
-export const Leaderboard = ({}) => {
-  const [tooltip, setTooltip] = useState(false);
-  const [netSwitch, setNetSwitch] = useState(true);
+export const Leaderboard = ({ netSwitch, setNetSwitch }) => {
+  const [modalOpened, setModalOpened] = useState(false);
   const isMobile = useMediaQuery("(max-width: 782px)");
 
   return (
@@ -16,23 +15,53 @@ export const Leaderboard = ({}) => {
       </Stack>
       <Group align="center" justify="center" gap="xs">
         <Text fw={900}>Leaderboard</Text>
-        <Tooltip
-          multiline
-          w={220}
-          opened={isMobile ? tooltip : undefined}
-          withArrow
-          transitionProps={{ duration: 200 }}
-          label={
-            netSwitch
-              ? "Net Points represent a player's net wins, with 3 points awarded for an outright win and 1 point for a tie. If there is a tie in total Net Points, the tiebreaker is determined by Net Average, which is calculated as the player's total net score divided by the number of rounds played. A lower Net Average wins the tiebreaker. Best Net refers to the lowest net score the player has recorded in a single round during the season."
-              : "Gross Points represent a player's gross wins, with 3 points awarded for an outright win and 1 point for a tie. If there is a tie in total Gross Points, the tiebreaker is determined by Gross Average, which is calculated as the player's total gross score divided by the number of rounds played. A lower Gross Average wins the tiebreaker. Best Gross refers to the lowest gross score the player has recorded in a single round during the season."
+        <IconInfoCircle
+          style={{ cursor: "pointer" }}
+          stroke={2}
+          onClick={() => setModalOpened(true)}
+        />
+        <Modal
+          opened={modalOpened}
+          onClose={() => setModalOpened(false)}
+          title={
+            <Text fw={700} size="lg">
+              {netSwitch ? "Net" : "Gross"} Points Scoring System
+            </Text>
           }
+          size="lg"
+          padding="xl"
         >
-          <IconInfoCircle
-            stroke={2}
-            onClick={isMobile ? () => setTooltip((o) => !o) : undefined}
-          />
-        </Tooltip>
+          <Stack gap="md">
+            <Text fw={600}>Points Awarded Per Round:</Text>
+            <Stack gap="xs" ml="md">
+              <Text>• 20 points for an outright win</Text>
+              <Text>• 15 points each for a tie for first place</Text>
+              <Text>• 10 points for second place</Text>
+              <Text>• 5 points each for a tie for second place</Text>
+              <Text>• 10 points each if all players tie</Text>
+            </Stack>
+
+            <Text fw={600} mt="md">
+              Tiebreaker Rules:
+            </Text>
+            <Text ml="md">
+              If there is a tie in total {netSwitch ? "Net" : "Gross"} Points,
+              the tiebreaker is determined by {netSwitch ? "Net" : "Gross"}{" "}
+              Average, which is calculated as the player's total{" "}
+              {netSwitch ? "net" : "gross"} score divided by the number of
+              rounds played. A lower average wins the tiebreaker.
+            </Text>
+
+            <Text fw={600} mt="md">
+              Best Score:
+            </Text>
+            <Text ml="md">
+              Best {netSwitch ? "Net" : "Gross"} refers to the lowest{" "}
+              {netSwitch ? "net" : "gross"} score the player has recorded in a
+              single round during the season.
+            </Text>
+          </Stack>
+        </Modal>
       </Group>
       <Stack align="center">
         <Tabs defaultValue="Net">
