@@ -52,14 +52,21 @@ export const ScoresChart = ({ netSwitch }) => {
 
   return (
     <Container size="sm" px={0}>
-      <Card shadow="sm" padding="md" radius="lg" withBorder>
+      <Card
+        shadow="sm"
+        padding="lg"
+        radius="lg"
+        withBorder
+        onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(0.98)")}
+        onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+      >
         <Stack gap="md">
           <Text fw={700} ta="center">
             {netSwitch ? "Net" : "Gross"} Scores Over Time
           </Text>
           <LineChart
             h={300}
-            w={isMobile ? 344 : 352}
+            w={isMobile ? 344 : 400}
             data={data}
             dataKey="date"
             series={series}

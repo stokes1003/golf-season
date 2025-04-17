@@ -83,7 +83,7 @@ export const Leaderboard = ({ netSwitch, setNetSwitch }) => {
             </Stack>
           ) : (
             <Stack>
-              <Group gap="lg" style={{ alignItems: "self-end" }}>
+              <Group gap="lg" justify="center" align="end">
                 <PlayerCard netSwitch={netSwitch} />
               </Group>
             </Stack>
