@@ -41,7 +41,7 @@ export const Statistics = ({ netSwitch }) => {
           </Stack>
         </Group>
       ) : (
-        <Paper shadow="sm" py="md" radius="md" withBorder>
+        <Paper shadow="sm" py="lg" radius="md" withBorder>
           <ScrollArea w="80vw" type="never">
             <Group justify="center" gap="lg" wrap="nowrap" px="lg">
               <Stack>

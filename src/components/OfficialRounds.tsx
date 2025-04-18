@@ -136,7 +136,7 @@ export const OfficialRounds = ({}) => {
           </Group>
         </ScrollArea>
       ) : (
-        <Paper shadow="sm" py="md" radius="md" withBorder>
+        <Paper shadow="sm" py="lg" radius="md" withBorder>
           <ScrollArea w="80vw" type="never">
             <Group wrap="nowrap" gap="lg" px="lg">
               {paginatedRounds.map((round) => (
