@@ -29,17 +29,19 @@ export const Statistics = ({ netSwitch }) => {
       </Stack>
 
       {isMobile ? (
-        <Group justify="center" gap="lg">
-          <Stack>
-            <ScoresChart netSwitch={netSwitch} />
-          </Stack>
-          <Stack>
-            <CourseAverages netSwitch={netSwitch} />
-          </Stack>
-          <Stack>
-            <HandicapEvolution />
-          </Stack>
-        </Group>
+        <ScrollArea w="80vw" type="never">
+          <Group justify="center" gap="lg" wrap="nowrap" px="lg">
+            <Stack>
+              <ScoresChart netSwitch={netSwitch} />
+            </Stack>
+            <Stack>
+              <CourseAverages netSwitch={netSwitch} />
+            </Stack>
+            <Stack>
+              <HandicapEvolution />
+            </Stack>
+          </Group>
+        </ScrollArea>
       ) : (
         <Paper shadow="sm" py="lg" radius="md" withBorder>
           <ScrollArea w="80vw" type="never">
