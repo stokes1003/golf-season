@@ -59,6 +59,10 @@ export const ScoresChart = ({ netSwitch }) => {
         withBorder
         onMouseEnter={(e) => (e.currentTarget.style.transform = "scale(0.98)")}
         onMouseLeave={(e) => (e.currentTarget.style.transform = "scale(1)")}
+        style={{
+          transition: "transform 0.2s ease-in-out",
+          transformOrigin: "center",
+        }}
       >
         <Stack gap="md">
           <Text fw={700} ta="center">
