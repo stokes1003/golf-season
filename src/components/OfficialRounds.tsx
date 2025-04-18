@@ -120,8 +120,8 @@ export const OfficialRounds = ({}) => {
         </Tabs.List>
       </Tabs>
 
-      {!isMobile ? (
-        <Stack gap="lg">
+      <ScrollArea w={isMobile ? "100vw" : "80vw"} type="never">
+        <Group wrap="nowrap" gap="lg" px="lg">
           {paginatedRounds.map((round) => (
             <RoundsCard
               key={round._id.toString()}
@@ -131,22 +131,8 @@ export const OfficialRounds = ({}) => {
               openModal={openModal}
             />
           ))}
-        </Stack>
-      ) : (
-        <ScrollArea w="100vw" type="never">
-          <Group wrap="nowrap" gap="lg" mx="lg" grow>
-            {paginatedRounds.map((round) => (
-              <RoundsCard
-                key={round._id.toString()}
-                round={round}
-                deleteRoundId={deleteRoundId}
-                setDeleteRoundId={setDeleteRoundId}
-                openModal={openModal}
-              />
-            ))}
-          </Group>
-        </ScrollArea>
-      )}
+        </Group>
+      </ScrollArea>
 
       {totalPages > 1 && (
         <Pagination

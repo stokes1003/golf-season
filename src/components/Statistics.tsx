@@ -11,7 +11,7 @@ const PLAYER_COLORS = {
 
 export const Statistics = ({ netSwitch }) => {
   return (
-    <Stack gap="lg" justify="space-evenly">
+    <Stack gap="lg">
       <Stack align="center" justify="center" gap="xs">
         <Text fw={900}>Statistics</Text>
         <Group justify="center" gap="lg">
@@ -23,9 +23,13 @@ export const Statistics = ({ netSwitch }) => {
           ))}
         </Group>
       </Stack>
-      <Group>
-        <ScoresChart netSwitch={netSwitch} />
-        <CourseAverages netSwitch={netSwitch} />
+      <Group justify="center" gap="lg">
+        <Stack>
+          <ScoresChart netSwitch={netSwitch} />
+        </Stack>
+        <Stack>
+          <CourseAverages netSwitch={netSwitch} />
+        </Stack>
       </Group>
     </Stack>
   );

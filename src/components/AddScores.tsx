@@ -54,30 +54,37 @@ export const AddScores = ({ setIsLeaderboard }) => {
     }
 
     if (currentPlayerIndex === players.length - 1) {
-      setIsLeaderboard(true);
-      await postScores({
-        course: golfCourse!,
-        date: new Date(),
-        scores: scoresByPlayer.map((player) => ({
-          player: player.player,
-          gross: parseInt(player.gross, 10),
-          hcp: parseInt(player.hcp, 10),
-          net: parseInt(player.gross, 10) - parseInt(player.hcp, 10),
-        })),
-      });
-      await updatePlayerPoints({
-        scores: scoresByPlayer.map((player) => ({
-          player: player.player,
-          gross: parseInt(player.gross, 10),
-          hcp: parseInt(player.hcp, 10),
-          net: parseInt(player.gross, 10) - parseInt(player.hcp, 10),
-        })),
-      });
-      await fetchScores();
-      await fetchPlayers();
+      try {
+        const roundData = {
+          course: golfCourse!,
+          date: new Date(),
+          scores: scoresByPlayer.map((player) => ({
+            player: player.player,
+            gross: parseInt(player.gross, 10),
+            hcp: parseInt(player.hcp, 10),
+            net: parseInt(player.gross, 10) - parseInt(player.hcp, 10),
+          })),
+        };
 
-      setCurrentPlayerIndex(0);
-      setCurrentStep("selectGolfCourse");
+        // First, post the scores
+        await postScores(roundData);
+
+        // Then update player points
+        await updatePlayerPoints({
+          scores: roundData.scores,
+        });
+
+        // Finally, refresh both scores and players data
+        await Promise.all([fetchScores(), fetchPlayers()]);
+
+        // Reset the form and return to leaderboard
+        setCurrentPlayerIndex(0);
+        setCurrentStep("selectGolfCourse");
+        setIsLeaderboard(true);
+      } catch (error) {
+        console.error("Error submitting scores:", error);
+        alert("There was an error submitting the scores. Please try again.");
+      }
     } else {
       setCurrentPlayerIndex((prev) => prev + 1);
     }
