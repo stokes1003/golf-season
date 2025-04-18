@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { ObjectId } from "mongodb";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
 type GolfCourse = {
   courseName: string;
@@ -30,6 +31,69 @@ export type Round = {
   scores: { player: string; gross: number; hcp: number; net: number }[];
 };
 
+const fetchGolfCourses = async (): Promise<GolfCourse[]> => {
+  const response = await fetch("/.netlify/functions/getGolfCourses");
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  return response.json();
+};
+
+const fetchScores = async (): Promise<AllScores[]> => {
+  const response = await fetch("/.netlify/functions/getScores");
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  const data = await response.json();
+  return data.sort(
+    (a: AllScores, b: AllScores) =>
+      new Date(b.date).getTime() - new Date(a.date).getTime()
+  );
+};
+
+const fetchPlayers = async (): Promise<Player[]> => {
+  const response = await fetch("/.netlify/functions/getPlayers");
+  if (!response.ok) {
+    throw new Error("Network response was not ok");
+  }
+  return response.json();
+};
+
+export function useGetGolfCourses() {
+  const { data: golfCourses = [] } = useQuery({
+    queryKey: ["golfCourses"],
+    queryFn: fetchGolfCourses,
+  });
+
+  return golfCourses;
+}
+
+export function useGetScores() {
+  const queryClient = useQueryClient();
+  const { data: scores = [], refetch } = useQuery({
+    queryKey: ["scores"],
+    queryFn: fetchScores,
+  });
+
+  return {
+    scores,
+    fetchScores: refetch,
+  };
+}
+
+export function useGetPlayers() {
+  const queryClient = useQueryClient();
+  const { data: players = [], refetch } = useQuery({
+    queryKey: ["players"],
+    queryFn: fetchPlayers,
+  });
+
+  return {
+    players,
+    fetchPlayers: refetch,
+  };
+}
+
 export function usePostScores() {
   const postScores = async (round: Round) => {
     try {
@@ -56,51 +120,6 @@ export function usePostScores() {
   };
 
   return postScores;
-}
-
-export function useGetGolfCourses() {
-  const [golfCourses, setGolfCourses] = useState<GolfCourse[]>([]);
-
-  useEffect(() => {
-    const fetchGolfCourses = async () => {
-      try {
-        const response = await fetch("/.netlify/functions/getGolfCourses");
-        const data = await response.json();
-        setGolfCourses(data);
-      } catch (error) {
-        console.error("Error fetching golf courses:", error);
-      }
-    };
-    fetchGolfCourses();
-  }, []);
-
-  return golfCourses;
-}
-
-export function useGetScores() {
-  const [scores, setScores] = useState<AllScores[]>([]);
-  const fetchScores = async () => {
-    try {
-      const response = await fetch("/.netlify/functions/getScores");
-      const data = await response.json();
-      const sortedScores = data.sort(
-        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
-      setScores(sortedScores);
-      console.log("Scores fetched successfully:", sortedScores);
-    } catch (error) {
-      console.error("Error fetching scores:", error);
-    }
-  };
-
-  useEffect(() => {
-    const getScores = async () => {
-      await fetchScores();
-    };
-    getScores();
-  }, []);
-
-  return { scores, fetchScores };
 }
 
 export function calculatePoints(scores) {
@@ -136,23 +155,24 @@ export function calculatePoints(scores) {
 }
 
 export function useUpdatePlayerPoints() {
-  const updatePlayerPoints = async (round) => {
-    const netScores = round.scores.map((s) => ({
-      player: s.player,
-      score: s.net,
-    }));
-    const grossScores = round.scores.map((s) => ({
-      player: s.player,
-      score: s.gross,
-    }));
+  const queryClient = useQueryClient();
 
-    const netPoints = calculatePoints(netScores);
-    const grossPoints = calculatePoints(grossScores);
+  const mutation = useMutation({
+    mutationFn: async (round: {
+      scores: { player: string; net: number; gross: number }[];
+    }) => {
+      const netScores = round.scores.map((s) => ({
+        player: s.player,
+        score: s.net,
+      }));
+      const grossScores = round.scores.map((s) => ({
+        player: s.player,
+        score: s.gross,
+      }));
 
-    console.log("Net Points:", netPoints);
-    console.log("Gross Points:", grossPoints);
+      const netPoints = calculatePoints(netScores);
+      const grossPoints = calculatePoints(grossScores);
 
-    try {
       const response = await fetch("/.netlify/functions/updatePlayerPoints", {
         method: "PATCH",
         headers: {
@@ -165,41 +185,16 @@ export function useUpdatePlayerPoints() {
       });
 
       if (!response.ok) {
-        console.error(
-          "Failed to update winners:",
-          response.status,
-          response.statusText
-        );
-        return;
+        throw new Error("Failed to update player points");
       }
 
-      const data = await response.json();
-    } catch (error) {
-      console.error("Error updating winners:", error);
-    }
-  };
+      return response.json();
+    },
+    onSuccess: () => {
+      // Invalidate and refetch players data after successful update
+      queryClient.invalidateQueries({ queryKey: ["players"] });
+    },
+  });
 
-  return updatePlayerPoints;
-}
-
-export function useGetPlayers() {
-  const [players, setPlayers] = useState<Player[]>([]);
-  const fetchPlayers = async () => {
-    try {
-      const response = await fetch("/.netlify/functions/getPlayers");
-      const data = await response.json();
-      setPlayers(data);
-    } catch (error) {
-      console.error("Error fetching players:", error);
-    }
-  };
-
-  useEffect(() => {
-    const getPlayers = async () => {
-      await fetchPlayers();
-    };
-    getPlayers();
-  }, []);
-
-  return { players, fetchPlayers };
+  return mutation.mutate;
 }
