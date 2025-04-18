@@ -1,7 +1,8 @@
-import { Stack, Text, Group, Box } from "@mantine/core";
+import { Stack, Text, Group, Box, Paper, ScrollArea } from "@mantine/core";
 import { ScoresChart } from "./ScoresChart";
 import { CourseAverages } from "./CourseAverages";
 import React from "react";
+import { useMediaQuery } from "@mantine/hooks";
 
 const PLAYER_COLORS = {
   Travis: "#FF6B6B", // Red
@@ -10,6 +11,8 @@ const PLAYER_COLORS = {
 };
 
 export const Statistics = ({ netSwitch }) => {
+  const isMobile = useMediaQuery("(max-width: 782px)");
+
   return (
     <Stack gap="lg">
       <Stack align="center" justify="center" gap="xs">
@@ -23,14 +26,30 @@ export const Statistics = ({ netSwitch }) => {
           ))}
         </Group>
       </Stack>
-      <Group justify="center" gap="lg">
-        <Stack>
-          <ScoresChart netSwitch={netSwitch} />
-        </Stack>
-        <Stack>
-          <CourseAverages netSwitch={netSwitch} />
-        </Stack>
-      </Group>
+
+      {isMobile ? (
+        <Group justify="center" gap="lg">
+          <Stack>
+            <ScoresChart netSwitch={netSwitch} />
+          </Stack>
+          <Stack>
+            <CourseAverages netSwitch={netSwitch} />
+          </Stack>
+        </Group>
+      ) : (
+        <Paper shadow="sm" py="md" radius="md" withBorder>
+          <ScrollArea w="80vw" type="never">
+            <Group justify="center" gap="lg">
+              <Stack>
+                <ScoresChart netSwitch={netSwitch} />
+              </Stack>
+              <Stack>
+                <CourseAverages netSwitch={netSwitch} />
+              </Stack>
+            </Group>
+          </ScrollArea>
+        </Paper>
+      )}
     </Stack>
   );
 };

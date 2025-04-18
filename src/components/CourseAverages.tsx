@@ -103,7 +103,7 @@ export const CourseAverages = ({ netSwitch }: { netSwitch: boolean }) => {
           </Text>
           <BarChart
             h={300}
-            w={isMobile ? 344 : 400}
+            w={isMobile ? 344 : 450}
             data={data}
             dataKey="course"
             series={series}

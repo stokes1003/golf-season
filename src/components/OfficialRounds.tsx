@@ -7,6 +7,7 @@ import {
   ScrollArea,
   Pagination,
   Tabs,
+  Paper,
 } from "@mantine/core";
 import { useDisclosure, useMediaQuery } from "@mantine/hooks";
 import React, { useState, useMemo } from "react";
@@ -120,19 +121,37 @@ export const OfficialRounds = ({}) => {
         </Tabs.List>
       </Tabs>
 
-      <ScrollArea w={isMobile ? "100vw" : "80vw"} type="never">
-        <Group wrap="nowrap" gap="lg" px="lg">
-          {paginatedRounds.map((round) => (
-            <RoundsCard
-              key={round._id.toString()}
-              round={round}
-              deleteRoundId={deleteRoundId}
-              setDeleteRoundId={setDeleteRoundId}
-              openModal={openModal}
-            />
-          ))}
-        </Group>
-      </ScrollArea>
+      {isMobile ? (
+        <ScrollArea w="100vw" type="never">
+          <Group wrap="nowrap" gap="lg" px="lg">
+            {paginatedRounds.map((round) => (
+              <RoundsCard
+                key={round._id.toString()}
+                round={round}
+                deleteRoundId={deleteRoundId}
+                setDeleteRoundId={setDeleteRoundId}
+                openModal={openModal}
+              />
+            ))}
+          </Group>
+        </ScrollArea>
+      ) : (
+        <Paper shadow="sm" py="md" radius="md" withBorder>
+          <ScrollArea w="80vw" type="never">
+            <Group wrap="nowrap" gap="lg" px="lg">
+              {paginatedRounds.map((round) => (
+                <RoundsCard
+                  key={round._id.toString()}
+                  round={round}
+                  deleteRoundId={deleteRoundId}
+                  setDeleteRoundId={setDeleteRoundId}
+                  openModal={openModal}
+                />
+              ))}
+            </Group>
+          </ScrollArea>
+        </Paper>
+      )}
 
       {totalPages > 1 && (
         <Pagination

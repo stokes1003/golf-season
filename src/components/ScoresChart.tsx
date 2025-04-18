@@ -66,7 +66,7 @@ export const ScoresChart = ({ netSwitch }) => {
           </Text>
           <LineChart
             h={300}
-            w={isMobile ? 344 : 400}
+            w={isMobile ? 344 : 450}
             data={data}
             dataKey="date"
             series={series}
