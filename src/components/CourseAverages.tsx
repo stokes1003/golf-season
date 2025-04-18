@@ -45,18 +45,19 @@ export const CourseAverages = ({ netSwitch }: { netSwitch: boolean }) => {
       if (!courseData.has(round.course)) {
         courseData.set(round.course, {
           courseName: round.course,
-          playerScores: players.reduce((acc, player) => {
-            acc[player.player] = { total: 0, count: 0 };
-            return acc;
-          }, {} as { [key: string]: PlayerStats }),
+          playerScores: Object.fromEntries(
+            players.map((player) => [player.player, { total: 0, count: 0 }])
+          ) as { [key: string]: PlayerStats },
         });
       }
 
       const courseStats = courseData.get(round.course)!;
       round.scores.forEach((score) => {
-        const playerStats = courseStats.playerScores[score.player];
-        playerStats.total += netSwitch ? score.net : score.gross;
-        playerStats.count += 1;
+        if (courseStats.playerScores[score.player]) {
+          const playerStats = courseStats.playerScores[score.player];
+          playerStats.total += netSwitch ? score.net : score.gross;
+          playerStats.count += 1;
+        }
       });
     });
 
