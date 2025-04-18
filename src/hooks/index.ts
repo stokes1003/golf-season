@@ -19,6 +19,7 @@ export type Player = {
   player: string;
   netPoints: number;
   grossPoints: number;
+  handicap: number;
   img: string;
   _id: ObjectId;
 };

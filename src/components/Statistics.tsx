@@ -1,6 +1,7 @@
 import { Stack, Text, Group, Box, Paper, ScrollArea } from "@mantine/core";
 import { ScoresChart } from "./ScoresChart";
 import { CourseAverages } from "./CourseAverages";
+import { HandicapEvolution } from "./HandicapEvolution";
 import React from "react";
 import { useMediaQuery } from "@mantine/hooks";
 
@@ -35,16 +36,22 @@ export const Statistics = ({ netSwitch }) => {
           <Stack>
             <CourseAverages netSwitch={netSwitch} />
           </Stack>
+          <Stack>
+            <HandicapEvolution />
+          </Stack>
         </Group>
       ) : (
         <Paper shadow="sm" py="md" radius="md" withBorder>
           <ScrollArea w="80vw" type="never">
-            <Group justify="center" gap="lg">
+            <Group justify="center" gap="lg" wrap="nowrap">
               <Stack>
                 <ScoresChart netSwitch={netSwitch} />
               </Stack>
               <Stack>
                 <CourseAverages netSwitch={netSwitch} />
+              </Stack>
+              <Stack>
+                <HandicapEvolution />
               </Stack>
             </Group>
           </ScrollArea>
