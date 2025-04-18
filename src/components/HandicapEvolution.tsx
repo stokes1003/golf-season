@@ -74,40 +74,32 @@ export const HandicapEvolution = () => {
             curveType="monotone"
             connectNulls
             gridAxis="xy"
-            tickLine="xy"
+            tickLine="y"
             withTooltip
+            withDots
+            tooltipAnimationDuration={200}
+            dotProps={{
+              r: 5,
+              strokeWidth: 2,
+              style: { fill: "white", cursor: "pointer" },
+            }}
+            gridProps={{
+              strokeDasharray: "5 5",
+              stroke: "#e9ecef",
+            }}
             xAxisProps={{
-              tickLine: true,
               style: {
                 fontSize: "12px",
                 fontWeight: 500,
               },
+              tickMargin: 10,
             }}
             yAxisProps={{
-              tickLine: true,
+              tickMargin: 15,
+              width: 35,
               style: {
                 fontSize: "12px",
                 fontWeight: 500,
-              },
-            }}
-            tooltipProps={{
-              content: ({ payload }) => {
-                if (!payload?.length) return null;
-                return (
-                  <Stack
-                    gap={4}
-                    p="xs"
-                    bg="white"
-                    style={{ border: "1px solid #ccc", borderRadius: "4px" }}
-                  >
-                    <Text fw={500}>{payload[0].payload.date}</Text>
-                    {payload.map((entry) => (
-                      <Text key={entry.name} c={entry.color} fz="sm">
-                        {entry.name}: {entry.value}
-                      </Text>
-                    ))}
-                  </Stack>
-                );
               },
             }}
           />

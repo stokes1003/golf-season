@@ -43,7 +43,7 @@ export const Statistics = ({ netSwitch }) => {
       ) : (
         <Paper shadow="sm" py="md" radius="md" withBorder>
           <ScrollArea w="80vw" type="never">
-            <Group justify="center" gap="lg" wrap="nowrap">
+            <Group justify="center" gap="lg" wrap="nowrap" px="lg">
               <Stack>
                 <ScoresChart netSwitch={netSwitch} />
               </Stack>
