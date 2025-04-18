@@ -1,4 +1,12 @@
-import { Stack, Text, Group, Title, Modal, Tabs, Button } from "@mantine/core";
+import {
+  Stack,
+  Text,
+  Group,
+  Title,
+  Modal,
+  Tabs,
+  ScrollArea,
+} from "@mantine/core";
 import React, { useState } from "react";
 import { useMediaQuery } from "@mantine/hooks";
 import { PlayerCard } from "./PlayerCard";
@@ -78,9 +86,11 @@ export const Leaderboard = ({ netSwitch, setNetSwitch }) => {
       <Stack>
         <Stack gap="lg">
           {isMobile ? (
-            <Stack align="center">
-              <PlayerCard netSwitch={netSwitch} />
-            </Stack>
+            <ScrollArea w="100vw" type="never">
+              <Group justify="center" gap="lg" wrap="nowrap" px="lg">
+                <PlayerCard netSwitch={netSwitch} />
+              </Group>
+            </ScrollArea>
           ) : (
             <Stack>
               <Group gap="lg" justify="center" align="end">

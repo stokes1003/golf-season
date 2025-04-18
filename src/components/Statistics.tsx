@@ -29,7 +29,7 @@ export const Statistics = ({ netSwitch }) => {
       </Stack>
 
       {isMobile ? (
-        <ScrollArea w="80vw" type="never">
+        <ScrollArea w="100vw" type="never">
           <Group justify="center" gap="lg" wrap="nowrap" px="lg">
             <Stack>
               <ScoresChart netSwitch={netSwitch} />
