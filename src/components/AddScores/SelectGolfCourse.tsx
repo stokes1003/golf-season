@@ -9,19 +9,23 @@ import {
 } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
 import React from "react";
-
 export function SelectGolfCourse({
   currentStep,
   setCurrentStep,
   golfCourses,
   golfCourse,
   setGolfCourse,
-
   setIsMajor,
 }) {
   const handleIsMajor = (value: string | null) => {
     setIsMajor(value === "yes");
   };
+  const majorTooltip = (
+    <Stack gap={5} align="center">
+      <Text fw={600}>Major = double points</Text>
+      <Text>Use this for high-stakes rounds you want to count extra.</Text>
+    </Stack>
+  );
 
   return (
     <>
@@ -44,8 +48,11 @@ export function SelectGolfCourse({
               <Group gap={2}>
                 <Text fw={600}>Is this round a Major?</Text>
                 <Tooltip
-                  label="Major rounds double all points."
-                  position="right"
+                  label={majorTooltip}
+                  position="bottom-end"
+                  events={{ hover: true, focus: true, touch: true }}
+                  multiline
+                  w={220}
                 >
                   <IconInfoCircle style={{ cursor: "pointer" }} stroke={2} />
                 </Tooltip>
