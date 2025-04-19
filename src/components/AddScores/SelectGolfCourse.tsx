@@ -53,6 +53,7 @@ export function SelectGolfCourse({
                 onChange={setGolfCourse}
               />
             </Stack>
+
             <Stack align="center" gap={5}>
               <Group gap={2}>
                 <Text fw={600}>Is this round a Major?</Text>
@@ -77,17 +78,16 @@ export function SelectGolfCourse({
                   </Tabs.Tab>
                 </Group>
               </Tabs>
-
-              {isMajor && (
-                <TextInput
-                  placeholder="Enter major name"
-                  value={majorName}
-                  onChange={(e) => setMajorName(e.target.value)}
-                  w={200}
-                  required
-                />
-              )}
             </Stack>
+            {isMajor && (
+              <TextInput
+                placeholder="Enter major name"
+                value={majorName}
+                onChange={(e) => setMajorName(e.target.value)}
+                w={200}
+                required
+              />
+            )}
           </Stack>
 
           <Button
