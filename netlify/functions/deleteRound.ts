@@ -41,8 +41,8 @@ const handler: Handler = async (event) => {
       score: s.gross,
     }));
 
-    const netPoints = calculatePoints(netScores);
-    const grossPoints = calculatePoints(grossScores);
+    const netPoints = calculatePoints(netScores, round.isMajor);
+    const grossPoints = calculatePoints(grossScores, round.isMajor);
 
     const playersCollection = db.collection("players");
 

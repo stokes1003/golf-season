@@ -8,7 +8,11 @@ import {
   Avatar,
   Box,
   Title,
+  Tabs,
+  Tooltip,
+  Modal,
 } from "@mantine/core";
+import { useMediaQuery, useDisclosure } from "@mantine/hooks";
 import React, { useState } from "react";
 import {
   useGetGolfCourses,
@@ -17,7 +21,11 @@ import {
   useUpdatePlayerPoints,
   useGetScores,
 } from "../hooks";
-import { IconX, IconArrowNarrowLeft } from "@tabler/icons-react";
+import {
+  IconX,
+  IconArrowNarrowLeft,
+  IconInfoCircle,
+} from "@tabler/icons-react";
 
 export const AddScores = ({ setIsLeaderboard }) => {
   const golfCourses = useGetGolfCourses();
@@ -28,12 +36,20 @@ export const AddScores = ({ setIsLeaderboard }) => {
   const { players, fetchPlayers } = useGetPlayers();
   const { fetchScores } = useGetScores();
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
+  const [isMajor, setIsMajor] = useState(false);
+  const isMobile = useMediaQuery("(max-width: 768px)") ?? false;
+  const [opened, { open, close }] = useDisclosure(false);
 
   const [scoresByPlayer, setScoresByPlayer] = useState([
     { player: "Travis", gross: "", hcp: "" },
     { player: "Stokes", gross: "", hcp: "" },
     { player: "JP", gross: "", hcp: "" },
   ]);
+
+  const handleIsMajor = (value: string | null) => {
+    setIsMajor(value === "yes");
+  };
+  console.log(isMajor);
 
   const handleSubmitScores = async () => {
     const gross = parseInt(scoresByPlayer[currentPlayerIndex].gross, 10);
@@ -54,39 +70,46 @@ export const AddScores = ({ setIsLeaderboard }) => {
     }
 
     if (currentPlayerIndex === players.length - 1) {
-      try {
-        const roundData = {
-          course: golfCourse!,
-          date: new Date(),
-          scores: scoresByPlayer.map((player) => ({
-            player: player.player,
-            gross: parseInt(player.gross, 10),
-            hcp: parseInt(player.hcp, 10),
-            net: parseInt(player.gross, 10) - parseInt(player.hcp, 10),
-          })),
-        };
-
-        // First, post the scores
-        await postScores(roundData);
-
-        // Then update player points
-        await updatePlayerPoints({
-          scores: roundData.scores,
-        });
-
-        // Finally, refresh both scores and players data
-        await Promise.all([fetchScores(), fetchPlayers()]);
-
-        // Reset the form and return to leaderboard
-        setCurrentPlayerIndex(0);
-        setCurrentStep("selectGolfCourse");
-        setIsLeaderboard(true);
-      } catch (error) {
-        console.error("Error submitting scores:", error);
-        alert("There was an error submitting the scores. Please try again.");
-      }
+      open();
     } else {
       setCurrentPlayerIndex((prev) => prev + 1);
+    }
+  };
+
+  const submitRound = async () => {
+    try {
+      const roundData = {
+        course: golfCourse!,
+        date: new Date(),
+        isMajor: isMajor,
+        scores: scoresByPlayer.map((player) => ({
+          player: player.player,
+          gross: parseInt(player.gross, 10),
+          hcp: parseInt(player.hcp, 10),
+          net: parseInt(player.gross, 10) - parseInt(player.hcp, 10),
+        })),
+      };
+
+      // First, post the scores
+      await postScores(roundData);
+
+      // Then update player points
+      await updatePlayerPoints({
+        scores: roundData.scores,
+        isMajor: roundData.isMajor,
+      });
+
+      // Finally, refresh both scores and players data
+      await Promise.all([fetchScores(), fetchPlayers()]);
+
+      // Reset the form and return to leaderboard
+      setCurrentPlayerIndex(0);
+      setCurrentStep("selectGolfCourse");
+      close();
+      setIsLeaderboard(true);
+    } catch (error) {
+      console.error("Error submitting scores:", error);
+      alert("There was an error submitting the scores. Please try again.");
     }
   };
 
@@ -168,18 +191,43 @@ export const AddScores = ({ setIsLeaderboard }) => {
       )}
 
       {currentStep === "selectGolfCourse" && (
-        <Stack gap="md" align="center">
-          <Stack gap="xs">
-            <Text fw={600}> Select Golf Course</Text>
-            <Select
-              w={200}
-              data={golfCourses.map((course) => ({
-                value: course.courseName,
-                label: course.courseName,
-              }))}
-              value={golfCourse}
-              onChange={setGolfCourse}
-            />
+        <Stack gap="lg" align="center">
+          <Stack gap="lg">
+            <Stack gap="xs" align="center">
+              <Text fw={600}> Select Golf Course</Text>
+              <Select
+                w={200}
+                data={golfCourses.map((course) => ({
+                  value: course.courseName,
+                  label: course.courseName,
+                }))}
+                value={golfCourse}
+                onChange={setGolfCourse}
+              />
+            </Stack>
+            <Group justify="space-between">
+              <Group gap={2}>
+                <Text fw={600}>Is this round a Major?</Text>
+                <Tooltip
+                  label="Major tournaments double all points."
+                  position="right"
+                  events={{
+                    hover: !isMobile,
+                    focus: isMobile,
+                    touch: isMobile,
+                  }}
+                >
+                  <IconInfoCircle style={{ cursor: "pointer" }} stroke={2} />
+                </Tooltip>
+              </Group>
+
+              <Tabs defaultValue="no" onChange={handleIsMajor}>
+                <Group gap="xs">
+                  <Tabs.Tab value="yes">Yes</Tabs.Tab>
+                  <Tabs.Tab value="no">No</Tabs.Tab>
+                </Group>
+              </Tabs>
+            </Group>
           </Stack>
 
           <Button
@@ -239,6 +287,53 @@ export const AddScores = ({ setIsLeaderboard }) => {
           </Button>
         </Stack>
       )}
+
+      <Modal
+        opened={opened}
+        onClose={close}
+        title="Confirm Round Details"
+        centered
+        size="sm"
+      >
+        <Stack gap="md" align="center">
+          <Text fw={700}>{golfCourse}</Text>
+          {isMajor && (
+            <Text c="blue" fw={500}>
+              Major Tournament
+            </Text>
+          )}
+          <Stack gap="sm">
+            {scoresByPlayer.map((player, index) => (
+              <Group key={player.player} justify="space-between" gap="sm">
+                <Avatar src={players[index].img} size="md" />
+
+                <Group gap="sm">
+                  <Group gap="xs">
+                    <Text fw={600}>GRS:</Text>
+                    <Text w={30}>{player.gross}</Text>
+                  </Group>
+                  <Group gap="xs">
+                    <Text fw={600}>HCP:</Text>
+                    <Text w={20}>{player.hcp}</Text>
+                  </Group>
+                  <Group gap="xs">
+                    <Text fw={600}>NET:</Text>
+                    <Text w={30}>
+                      {parseInt(player.gross) - parseInt(player.hcp)}
+                    </Text>
+                  </Group>
+                </Group>
+              </Group>
+            ))}
+          </Stack>
+          <Group mt="md" justify="center">
+            <Button variant="outline" onClick={close}>
+              Cancel
+            </Button>
+            <Button onClick={submitRound}>Confirm & Submit</Button>
+          </Group>
+        </Stack>
+      </Modal>
     </Stack>
   );
 };

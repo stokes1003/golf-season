@@ -5,7 +5,6 @@ import {
   Button,
   Modal,
   ScrollArea,
-  Pagination,
   Tabs,
   Paper,
 } from "@mantine/core";
@@ -20,7 +19,6 @@ export const OfficialRounds = ({}) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteRoundId, setDeleteRoundId] = useState<string | null>(null);
   const [opened, { open, close }] = useDisclosure(false);
-  const [activePage, setActivePage] = useState(1);
   const [selectedMonth, setSelectedMonth] = useState<string | null>("all");
   const isMobile = useMediaQuery("(max-width: 620px)");
 
@@ -89,26 +87,13 @@ export const OfficialRounds = ({}) => {
 
   if (!scores) return <Text>Loading...</Text>;
 
-  const ITEMS_PER_PAGE = 5;
-  const totalPages = Math.ceil((currentRounds?.length || 0) / ITEMS_PER_PAGE);
-  const paginatedRounds = currentRounds.slice(
-    (activePage - 1) * ITEMS_PER_PAGE,
-    activePage * ITEMS_PER_PAGE
-  );
-
-  // Reset pagination when changing months
-  const handleMonthChange = (value: string | null) => {
-    setSelectedMonth(value);
-    setActivePage(1);
-  };
-
   return (
     <Stack gap="lg" align="center">
       <Text fw={900}>Official Rounds</Text>
 
       <Tabs
         value={selectedMonth}
-        onChange={handleMonthChange}
+        onChange={setSelectedMonth}
         defaultValue="all"
       >
         <Tabs.List>
@@ -124,7 +109,7 @@ export const OfficialRounds = ({}) => {
       {isMobile ? (
         <ScrollArea w="100vw" type="never">
           <Group wrap="nowrap" gap="lg" px="lg">
-            {paginatedRounds.map((round) => (
+            {currentRounds.map((round) => (
               <RoundsCard
                 key={round._id.toString()}
                 round={round}
@@ -139,7 +124,7 @@ export const OfficialRounds = ({}) => {
         <Paper shadow="sm" py="lg" radius="md" withBorder>
           <ScrollArea w="80vw" type="never">
             <Group wrap="nowrap" gap="lg" px="lg">
-              {paginatedRounds.map((round) => (
+              {currentRounds.map((round) => (
                 <RoundsCard
                   key={round._id.toString()}
                   round={round}
@@ -151,15 +136,6 @@ export const OfficialRounds = ({}) => {
             </Group>
           </ScrollArea>
         </Paper>
-      )}
-
-      {totalPages > 1 && (
-        <Pagination
-          total={totalPages}
-          value={activePage}
-          onChange={setActivePage}
-          mt="md"
-        />
       )}
 
       <Modal

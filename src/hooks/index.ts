@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import { ObjectId } from "mongodb";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 
@@ -12,6 +11,7 @@ type GolfCourse = {
 export type AllScores = {
   course: string;
   date: string;
+  isMajor: boolean;
   scores: { player: string; gross: number; hcp: number; net: number }[];
   _id: ObjectId;
 };
@@ -122,7 +122,10 @@ export function usePostScores() {
   return postScores;
 }
 
-export function calculatePoints(scores) {
+export function calculatePoints(
+  scores: { player: string; score: number }[],
+  isMajor: boolean = false
+) {
   const sortedScores = scores
     .map((s) => ({ player: s.player, score: s.score }))
     .sort((a, b) => a.score - b.score);
@@ -132,23 +135,24 @@ export function calculatePoints(scores) {
   const allPlayersTied = uniqueScores.size === 1;
 
   let points = {};
+  const multiplier = isMajor ? 2 : 1;
 
   if (allPlayersTied) {
     sortedScores.forEach((s) => {
-      points[s.player] = 10;
+      points[s.player] = 10 * multiplier;
     });
   } else if (uniqueScores.size === scoreValues.length) {
-    points[sortedScores[0].player] = 20;
-    points[sortedScores[1].player] = 10;
+    points[sortedScores[0].player] = 20 * multiplier;
+    points[sortedScores[1].player] = 10 * multiplier;
     points[sortedScores[2].player] = 0;
   } else if (scoreValues[0] === scoreValues[1]) {
-    points[sortedScores[0].player] = 15;
-    points[sortedScores[1].player] = 15;
+    points[sortedScores[0].player] = 15 * multiplier;
+    points[sortedScores[1].player] = 15 * multiplier;
     points[sortedScores[2].player] = 0;
   } else if (scoreValues[1] === scoreValues[2]) {
-    points[sortedScores[0].player] = 20;
-    points[sortedScores[1].player] = 5;
-    points[sortedScores[2].player] = 5;
+    points[sortedScores[0].player] = 20 * multiplier;
+    points[sortedScores[1].player] = 5 * multiplier;
+    points[sortedScores[2].player] = 5 * multiplier;
   }
 
   return points;
@@ -160,6 +164,7 @@ export function useUpdatePlayerPoints() {
   const mutation = useMutation({
     mutationFn: async (round: {
       scores: { player: string; net: number; gross: number }[];
+      isMajor: boolean;
     }) => {
       const netScores = round.scores.map((s) => ({
         player: s.player,
@@ -170,8 +175,8 @@ export function useUpdatePlayerPoints() {
         score: s.gross,
       }));
 
-      const netPoints = calculatePoints(netScores);
-      const grossPoints = calculatePoints(grossScores);
+      const netPoints = calculatePoints(netScores, round.isMajor);
+      const grossPoints = calculatePoints(grossScores, round.isMajor);
 
       const response = await fetch("/.netlify/functions/updatePlayerPoints", {
         method: "PATCH",
@@ -181,6 +186,7 @@ export function useUpdatePlayerPoints() {
         body: JSON.stringify({
           netPoints,
           grossPoints,
+          isMajor: round.isMajor,
         }),
       });
 
@@ -191,7 +197,6 @@ export function useUpdatePlayerPoints() {
       return response.json();
     },
     onSuccess: () => {
-      // Invalidate and refetch players data after successful update
       queryClient.invalidateQueries({ queryKey: ["players"] });
     },
   });
