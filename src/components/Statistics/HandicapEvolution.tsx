@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, Stack, Text, Container } from "@mantine/core";
 import { LineChart } from "@mantine/charts";
-import { useGetScores } from "../hooks";
+import { useGetScores } from "../../hooks";
 import { useMediaQuery } from "@mantine/hooks";
 
 const PLAYER_COLORS = {

@@ -1,7 +1,7 @@
 import { Stack, Text, Group, Box, Paper, ScrollArea } from "@mantine/core";
-import { ScoresChart } from "./ScoresChart";
-import { CourseAverages } from "./CourseAverages";
-import { HandicapEvolution } from "./HandicapEvolution";
+import { ScoresChart } from "./Statistics/ScoresChart";
+import { CourseAverages } from "./Statistics/CourseAverages";
+import { HandicapEvolution } from "./Statistics/HandicapEvolution";
 import React from "react";
 import { useMediaQuery } from "@mantine/hooks";
 

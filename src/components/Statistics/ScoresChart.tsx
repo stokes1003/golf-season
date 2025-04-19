@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, Stack, Text, Container } from "@mantine/core";
 import { LineChart } from "@mantine/charts";
-import { useGetScores, useGetPlayers } from "../hooks";
+import { useGetScores, useGetPlayers } from "../../hooks";
 import { useMediaQuery } from "@mantine/hooks";
 
 // Fixed colors for each player, matching RankingsChart for consistency

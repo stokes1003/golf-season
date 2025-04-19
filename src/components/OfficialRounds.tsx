@@ -160,8 +160,8 @@ export const OfficialRounds = ({}) => {
               >
                 Cancel
               </Button>
-              <Button w={150} onClick={deleteRound} disabled={isDeleting}>
-                {isDeleting ? "Deleting..." : "Delete"}
+              <Button w={150} onClick={deleteRound} loading={isDeleting}>
+                Delete
               </Button>
             </Stack>
           )}
@@ -175,8 +175,8 @@ export const OfficialRounds = ({}) => {
               >
                 Cancel
               </Button>
-              <Button w={150} onClick={deleteRound} disabled={isDeleting}>
-                {isDeleting ? "Deleting..." : "Delete"}
+              <Button w={150} onClick={deleteRound} loading={isDeleting}>
+                Delete
               </Button>
             </Group>
           )}

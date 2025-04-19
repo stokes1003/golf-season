@@ -3,7 +3,7 @@ import { Card, Stack, Text, Container } from "@mantine/core";
 import { BarChart } from "@mantine/charts";
 import "@mantine/core/styles.css";
 import "@mantine/charts/styles.css";
-import { useGetScores, useGetPlayers } from "../hooks";
+import { useGetScores, useGetPlayers } from "../../hooks";
 import { useMediaQuery } from "@mantine/hooks";
 
 interface PlayerStats {
