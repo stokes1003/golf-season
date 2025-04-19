@@ -22,6 +22,7 @@ export const AddScores = ({ setIsLeaderboard }) => {
   const { fetchScores } = useGetScores();
   const [currentPlayerIndex, setCurrentPlayerIndex] = useState(0);
   const [isMajor, setIsMajor] = useState(false);
+  const [majorName, setMajorName] = useState("");
 
   const [opened, { open, close }] = useDisclosure(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -64,6 +65,7 @@ export const AddScores = ({ setIsLeaderboard }) => {
         course: golfCourse!,
         date: new Date(),
         isMajor: isMajor,
+        majorName: isMajor ? majorName : null,
         scores: scoresByPlayer.map((player) => ({
           player: player.player,
           gross: parseInt(player.gross, 10),
@@ -118,8 +120,10 @@ export const AddScores = ({ setIsLeaderboard }) => {
         golfCourses={golfCourses}
         golfCourse={golfCourse}
         setGolfCourse={setGolfCourse}
-        setIsMajor={setIsMajor}
         isMajor={isMajor}
+        setIsMajor={setIsMajor}
+        majorName={majorName}
+        setMajorName={setMajorName}
       />
 
       <EnterPlayerScores
@@ -137,6 +141,7 @@ export const AddScores = ({ setIsLeaderboard }) => {
         submitRound={submitRound}
         isSubmitting={isSubmitting}
         isMajor={isMajor}
+        majorName={majorName}
         isOpen={opened}
         onClose={close}
         golfCourse={golfCourse!}

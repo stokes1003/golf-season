@@ -9,10 +9,12 @@ import {
   Button,
   Box,
   Center,
+  ActionIcon,
+  Badge,
 } from "@mantine/core";
 import { useGetGolfCourses, useGetPlayers } from "../hooks";
 import { useMediaQuery } from "@mantine/hooks";
-import { IconTrophy } from "@tabler/icons-react";
+import { IconTrophy, IconTrash } from "@tabler/icons-react";
 
 export const RoundsCard = ({
   round,
@@ -23,6 +25,12 @@ export const RoundsCard = ({
   const { players } = useGetPlayers();
   const golfCourses = useGetGolfCourses();
   const isMobile = useMediaQuery("(max-width: 782px)");
+
+  const date = new Date(round.date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "numeric",
+  });
+
   return (
     <>
       <Card
@@ -84,16 +92,17 @@ export const RoundsCard = ({
               h="32px"
             >
               <Group align="center" gap={5} justify="center" h="100%">
-                <IconTrophy stroke={2} size={20} color="white" />
                 <Text fw={800} c="white">
-                  Major
+                  {round.majorName || "Major"}
                 </Text>
               </Group>
             </Box>
           )}
           <Stack gap="xs" align="center">
             <Text fw={800}>{round.course}</Text>
-            <Text>{new Date(round.date).toLocaleDateString()}</Text>
+            <Text size="sm" c="dimmed">
+              {date}
+            </Text>
           </Stack>
           <Stack align="center">
             <Group gap={48}>

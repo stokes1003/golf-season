@@ -6,9 +6,11 @@ import {
   Button,
   Group,
   Tabs,
+  TextInput,
 } from "@mantine/core";
 import { IconInfoCircle } from "@tabler/icons-react";
 import React from "react";
+
 export function SelectGolfCourse({
   currentStep,
   setCurrentStep,
@@ -17,10 +19,16 @@ export function SelectGolfCourse({
   setGolfCourse,
   isMajor,
   setIsMajor,
+  majorName,
+  setMajorName,
 }) {
   const handleIsMajor = (value: string | null) => {
     setIsMajor(value === "yes");
+    if (value !== "yes") {
+      setMajorName("");
+    }
   };
+
   const majorTooltip = (
     <Stack gap={5} align="center">
       <Text fw={600}>Major = double points</Text>
@@ -69,6 +77,16 @@ export function SelectGolfCourse({
                   </Tabs.Tab>
                 </Group>
               </Tabs>
+
+              {isMajor && (
+                <TextInput
+                  placeholder="Enter major name"
+                  value={majorName}
+                  onChange={(e) => setMajorName(e.target.value)}
+                  w={200}
+                  required
+                />
+              )}
             </Stack>
           </Stack>
 
@@ -77,6 +95,8 @@ export function SelectGolfCourse({
             onClick={() => {
               if (golfCourse === null) {
                 alert("Please select a golf course");
+              } else if (isMajor && !majorName) {
+                alert("Please enter a name for the major");
               } else {
                 setCurrentStep("enterPlayerScores");
               }

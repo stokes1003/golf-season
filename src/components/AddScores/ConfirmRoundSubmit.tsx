@@ -16,6 +16,7 @@ type PlayerScore = {
 type ConfirmRoundSubmitProps = {
   golfCourse: string;
   isMajor: boolean;
+  majorName?: string;
   submitRound: () => Promise<void>;
   isSubmitting: boolean;
   players: Player[];
@@ -27,6 +28,7 @@ type ConfirmRoundSubmitProps = {
 export function ConfirmRoundSubmit({
   golfCourse,
   isMajor,
+  majorName,
   submitRound,
   isSubmitting,
   players,
@@ -43,15 +45,18 @@ export function ConfirmRoundSubmit({
       size="sm"
     >
       <Stack gap="md" align="center">
-        <Stack gap="xs" align="center">
-          <Text fw={700}>{golfCourse}</Text>
-
+        <Stack gap="xs" align="center" w="100%">
           {isMajor && (
-            <Group gap={5} justify="center" align="center" h="100%">
-              <IconTrophy stroke={2} />
-              <Text fw={500}>Major</Text>
-            </Group>
+            <Box bg="green" w="100%" h="36px">
+              <Group gap={5} justify="center" align="center" h="100%">
+                <IconTrophy stroke={2} color="white" />
+                <Text fw={800} c="white">
+                  {majorName}
+                </Text>
+              </Group>
+            </Box>
           )}
+          <Text fw={700}>{golfCourse}</Text>
         </Stack>
 
         <Stack gap="sm">

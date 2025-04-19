@@ -63,6 +63,11 @@ export const OfficialRounds = ({}) => {
   };
 
   const deleteRound = async () => {
+    if (!deleteRoundId) {
+      console.error("No round selected for deletion");
+      return;
+    }
+
     try {
       setIsDeleting(true);
       const response = await fetch("/.netlify/functions/deleteRound", {
@@ -70,14 +75,18 @@ export const OfficialRounds = ({}) => {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ _id: deleteRoundId }),
       });
-      if (response.ok) {
-        setDeleteRoundId(null);
-        await fetchScores();
-        await fetchPlayers();
-        close();
+
+      if (!response.ok) {
+        const error = await response.text();
+        throw new Error(error || "Failed to delete round");
       }
+
+      await Promise.all([fetchScores(), fetchPlayers()]);
+      setDeleteRoundId(null);
+      close();
     } catch (error) {
       console.error("Error deleting round:", error);
+      alert("Failed to delete round. Please try again.");
     } finally {
       setIsDeleting(false);
     }
