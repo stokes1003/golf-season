@@ -15,6 +15,7 @@ export function SelectGolfCourse({
   golfCourses,
   golfCourse,
   setGolfCourse,
+  isMajor,
   setIsMajor,
 }) {
   const handleIsMajor = (value: string | null) => {
@@ -60,8 +61,12 @@ export function SelectGolfCourse({
 
               <Tabs defaultValue="no" onChange={handleIsMajor}>
                 <Group gap="xs">
-                  <Tabs.Tab value="yes">Yes</Tabs.Tab>
-                  <Tabs.Tab value="no">No</Tabs.Tab>
+                  <Tabs.Tab value="yes" color={isMajor ? "green" : "blue"}>
+                    Yes
+                  </Tabs.Tab>
+                  <Tabs.Tab value="no" color={isMajor ? "green" : "blue"}>
+                    No
+                  </Tabs.Tab>
                 </Group>
               </Tabs>
             </Stack>
@@ -76,6 +81,7 @@ export function SelectGolfCourse({
                 setCurrentStep("enterPlayerScores");
               }
             }}
+            color={isMajor ? "green" : "blue"}
           >
             Submit Course
           </Button>

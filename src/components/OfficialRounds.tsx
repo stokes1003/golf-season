@@ -30,7 +30,6 @@ export const OfficialRounds = ({}) => {
       const date = new Date(round.date);
       const monthYear = date.toLocaleString("default", {
         month: "long",
-        year: "numeric",
       });
       if (!grouped.has(monthYear)) {
         grouped.set(monthYear, []);
@@ -148,39 +147,52 @@ export const OfficialRounds = ({}) => {
           blur: 0.3,
         }}
       >
-        <Stack gap="lg" align="center">
-          <Text>Are you sure you want to delete this round?</Text>
-          {isMobile && (
-            <Stack>
-              <Button
-                variant="outline"
-                onClick={close}
-                w={150}
-                disabled={isDeleting}
-              >
-                Cancel
-              </Button>
-              <Button w={150} onClick={deleteRound} loading={isDeleting}>
-                Delete
-              </Button>
+        {(() => {
+          const currentRound = scores.find(
+            (r) => r._id.toString() === deleteRoundId
+          );
+          return (
+            <Stack gap="lg" align="center">
+              <Text>Are you sure you want to delete this round?</Text>
+              {isMobile && (
+                <Stack>
+                  <Button
+                    variant="outline"
+                    onClick={close}
+                    w={150}
+                    disabled={isDeleting}
+                  >
+                    Cancel
+                  </Button>
+                  <Button w={150} onClick={deleteRound} loading={isDeleting}>
+                    Delete
+                  </Button>
+                </Stack>
+              )}
+              {!isMobile && (
+                <Group>
+                  <Button
+                    variant="outline"
+                    onClick={close}
+                    w={150}
+                    disabled={isDeleting}
+                    color={currentRound?.isMajor ? "green" : "blue"}
+                  >
+                    Cancel
+                  </Button>
+                  <Button
+                    w={150}
+                    onClick={deleteRound}
+                    loading={isDeleting}
+                    color={currentRound?.isMajor ? "green" : "blue"}
+                  >
+                    Delete
+                  </Button>
+                </Group>
+              )}
             </Stack>
-          )}
-          {!isMobile && (
-            <Group>
-              <Button
-                variant="outline"
-                onClick={close}
-                w={150}
-                disabled={isDeleting}
-              >
-                Cancel
-              </Button>
-              <Button w={150} onClick={deleteRound} loading={isDeleting}>
-                Delete
-              </Button>
-            </Group>
-          )}
-        </Stack>
+          );
+        })()}
       </Modal>
     </Stack>
   );

@@ -11,6 +11,7 @@ type EnterPlayerScoresProps = {
   currentPlayerIndex: number;
   setCurrentPlayerIndex: (value: number | ((prev: number) => number)) => void;
   onSubmit: () => void;
+  isMajor: boolean;
 };
 
 export function EnterPlayerScores({
@@ -21,6 +22,7 @@ export function EnterPlayerScores({
   currentPlayerIndex,
   setCurrentPlayerIndex,
   onSubmit,
+  isMajor,
 }: EnterPlayerScoresProps) {
   if (currentStep !== "enterPlayerScores") return null;
 
@@ -80,7 +82,7 @@ export function EnterPlayerScores({
           />
         </Stack>
       </Group>
-      <Button w={150} onClick={onSubmit}>
+      <Button w={150} onClick={onSubmit} color={isMajor ? "green" : "blue"}>
         {currentPlayerIndex === players.length - 1
           ? "Submit Scores"
           : "Next Player"}

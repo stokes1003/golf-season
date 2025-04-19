@@ -1,7 +1,18 @@
 import React from "react";
-import { Card, Stack, Text, Group, Avatar, Image, Button } from "@mantine/core";
+import {
+  Card,
+  Stack,
+  Text,
+  Group,
+  Avatar,
+  Image,
+  Button,
+  Box,
+  Center,
+} from "@mantine/core";
 import { useGetGolfCourses, useGetPlayers } from "../hooks";
 import { useMediaQuery } from "@mantine/hooks";
+import { IconTrophy } from "@tabler/icons-react";
 
 export const RoundsCard = ({
   round,
@@ -43,6 +54,43 @@ export const RoundsCard = ({
               src={golfCourses.find((c) => c.courseName === round.course)?.img}
             />
           </Card.Section>
+          {/* {round.isMajor && (
+            <Box
+              pos="absolute"
+              top="0"
+              left="0"
+              bg="green"
+              w="45px"
+              h="45px"
+              style={{
+                borderRadius: "50%",
+                border: "1px solid white",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <IconTrophy stroke={2} size="30" color="white" />
+            </Box>
+          )} */}
+          {round.isMajor && (
+            <Box
+              pos="absolute"
+              bottom={
+                deleteRoundId === round._id.toString() ? "343px" : "290px"
+              }
+              bg="green"
+              w="100%"
+              h="32px"
+            >
+              <Group align="center" gap={5} justify="center" h="100%">
+                <IconTrophy stroke={2} size={20} color="white" />
+                <Text fw={800} c="white">
+                  Major
+                </Text>
+              </Group>
+            </Box>
+          )}
           <Stack gap="xs" align="center">
             <Text fw={800}>{round.course}</Text>
             <Text>{new Date(round.date).toLocaleDateString()}</Text>
@@ -92,6 +140,7 @@ export const RoundsCard = ({
                 e.stopPropagation();
                 openModal(round._id.toString());
               }}
+              color={round.isMajor ? "green" : "blue"}
             >
               Delete Round
             </Button>

@@ -1,5 +1,5 @@
 import React from "react";
-import { Modal, Stack, Group, Text, Button, Avatar } from "@mantine/core";
+import { Modal, Stack, Group, Text, Button, Avatar, Box } from "@mantine/core";
 import { IconTrophy } from "@tabler/icons-react";
 
 type Player = {
@@ -47,8 +47,9 @@ export function ConfirmRoundSubmit({
           <Text fw={700}>{golfCourse}</Text>
 
           {isMajor && (
-            <Group gap={5}>
-              <Text fw={500}>Major Tournament</Text> <IconTrophy stroke={2} />
+            <Group gap={5} justify="center" align="center" h="100%">
+              <IconTrophy stroke={2} />
+              <Text fw={500}>Major</Text>
             </Group>
           )}
         </Stack>
@@ -106,10 +107,19 @@ export function ConfirmRoundSubmit({
           })}
         </Stack>
         <Group mt="md" justify="center">
-          <Button variant="outline" onClick={onClose} disabled={isSubmitting}>
+          <Button
+            variant="outline"
+            onClick={onClose}
+            disabled={isSubmitting}
+            color={isMajor ? "green" : "blue"}
+          >
             Cancel
           </Button>
-          <Button onClick={submitRound} loading={isSubmitting}>
+          <Button
+            onClick={submitRound}
+            loading={isSubmitting}
+            color={isMajor ? "green" : "blue"}
+          >
             Confirm & Submit
           </Button>
         </Group>

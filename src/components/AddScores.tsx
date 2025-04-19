@@ -119,6 +119,7 @@ export const AddScores = ({ setIsLeaderboard }) => {
         golfCourse={golfCourse}
         setGolfCourse={setGolfCourse}
         setIsMajor={setIsMajor}
+        isMajor={isMajor}
       />
 
       <EnterPlayerScores
@@ -129,6 +130,7 @@ export const AddScores = ({ setIsLeaderboard }) => {
         currentPlayerIndex={currentPlayerIndex}
         setCurrentPlayerIndex={setCurrentPlayerIndex}
         onSubmit={handleSubmitScores}
+        isMajor={isMajor}
       />
 
       <ConfirmRoundSubmit
