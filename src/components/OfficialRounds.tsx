@@ -38,7 +38,6 @@ export const OfficialRounds = ({}) => {
       grouped.get(monthYear).push(round);
     });
 
-    // Sort rounds within each month by date (newest first)
     grouped.forEach((rounds) => {
       rounds.sort(
         (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()

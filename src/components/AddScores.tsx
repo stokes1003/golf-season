@@ -25,6 +25,7 @@ import {
   IconX,
   IconArrowNarrowLeft,
   IconInfoCircle,
+  IconTrophy,
 } from "@tabler/icons-react";
 
 export const AddScores = ({ setIsLeaderboard }) => {
@@ -39,6 +40,7 @@ export const AddScores = ({ setIsLeaderboard }) => {
   const [isMajor, setIsMajor] = useState(false);
   const isMobile = useMediaQuery("(max-width: 768px)") ?? false;
   const [opened, { open, close }] = useDisclosure(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [scoresByPlayer, setScoresByPlayer] = useState([
     { player: "Travis", gross: "", hcp: "" },
@@ -78,6 +80,7 @@ export const AddScores = ({ setIsLeaderboard }) => {
 
   const submitRound = async () => {
     try {
+      setIsSubmitting(true);
       const roundData = {
         course: golfCourse!,
         date: new Date(),
@@ -110,6 +113,8 @@ export const AddScores = ({ setIsLeaderboard }) => {
     } catch (error) {
       console.error("Error submitting scores:", error);
       alert("There was an error submitting the scores. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -191,8 +196,8 @@ export const AddScores = ({ setIsLeaderboard }) => {
       )}
 
       {currentStep === "selectGolfCourse" && (
-        <Stack gap="lg" align="center">
-          <Stack gap="lg">
+        <Stack gap="xl" align="center">
+          <Stack gap="xl">
             <Stack gap="xs" align="center">
               <Text fw={600}> Select Golf Course</Text>
               <Select
@@ -205,11 +210,11 @@ export const AddScores = ({ setIsLeaderboard }) => {
                 onChange={setGolfCourse}
               />
             </Stack>
-            <Group justify="space-between">
+            <Stack align="center" gap={5}>
               <Group gap={2}>
                 <Text fw={600}>Is this round a Major?</Text>
                 <Tooltip
-                  label="Major tournaments double all points."
+                  label="Major rounds double all points."
                   position="right"
                   events={{
                     hover: !isMobile,
@@ -227,7 +232,7 @@ export const AddScores = ({ setIsLeaderboard }) => {
                   <Tabs.Tab value="no">No</Tabs.Tab>
                 </Group>
               </Tabs>
-            </Group>
+            </Stack>
           </Stack>
 
           <Button
@@ -296,41 +301,63 @@ export const AddScores = ({ setIsLeaderboard }) => {
         size="sm"
       >
         <Stack gap="md" align="center">
-          <Text fw={700}>{golfCourse}</Text>
-          {isMajor && (
-            <Text c="blue" fw={500}>
-              Major Tournament
-            </Text>
-          )}
+          <Stack gap="xs" align="center">
+            <Text fw={700}>{golfCourse}</Text>
+
+            {isMajor && (
+              <Group gap={5}>
+                <Text fw={500}>Major Tournament</Text> <IconTrophy stroke={2} />
+              </Group>
+            )}
+          </Stack>
+
           <Stack gap="sm">
+            <Group gap="xl">
+              <Text w={40} fw={600} style={{ textAlign: "center" }}>
+                PLR
+              </Text>
+              <Text w={32} fw={600}>
+                GRS
+              </Text>
+              <Text w={32} fw={600}>
+                HCP
+              </Text>
+              <Text w={32} fw={600}>
+                NET
+              </Text>
+            </Group>
             {scoresByPlayer.map((player, index) => (
               <Group key={player.player} justify="space-between" gap="sm">
-                <Avatar src={players[index].img} size="md" />
-
-                <Group gap="sm">
-                  <Group gap="xs">
-                    <Text fw={600}>GRS:</Text>
-                    <Text w={30}>{player.gross}</Text>
+                <Stack gap="sm">
+                  <Group gap="xl">
+                    <Avatar w={40} src={players[index].img} size="md" />
+                    <Group gap="xs" align="center">
+                      <Text w={32} style={{ textAlign: "center" }}>
+                        {player.gross}
+                      </Text>
+                    </Group>
+                    <Group gap="xs" align="center">
+                      <Text w={32} style={{ textAlign: "center" }}>
+                        {player.hcp}
+                      </Text>
+                    </Group>
+                    <Group gap="xs" align="center">
+                      <Text w={32} style={{ textAlign: "center" }}>
+                        {parseInt(player.gross) - parseInt(player.hcp)}
+                      </Text>
+                    </Group>
                   </Group>
-                  <Group gap="xs">
-                    <Text fw={600}>HCP:</Text>
-                    <Text w={20}>{player.hcp}</Text>
-                  </Group>
-                  <Group gap="xs">
-                    <Text fw={600}>NET:</Text>
-                    <Text w={30}>
-                      {parseInt(player.gross) - parseInt(player.hcp)}
-                    </Text>
-                  </Group>
-                </Group>
+                </Stack>
               </Group>
             ))}
           </Stack>
           <Group mt="md" justify="center">
-            <Button variant="outline" onClick={close}>
+            <Button variant="outline" onClick={close} disabled={isSubmitting}>
               Cancel
             </Button>
-            <Button onClick={submitRound}>Confirm & Submit</Button>
+            <Button onClick={submitRound} disabled={isSubmitting}>
+              {isSubmitting ? "Submitting..." : "Confirm & Submit"}
+            </Button>
           </Group>
         </Stack>
       </Modal>
