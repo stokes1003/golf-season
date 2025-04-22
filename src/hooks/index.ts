@@ -70,7 +70,11 @@ export function useGetGolfCourses() {
 
 export function useGetScores() {
   const queryClient = useQueryClient();
-  const { data: scores = [], refetch } = useQuery({
+  const {
+    data: scores = [],
+    refetch,
+    isLoading,
+  } = useQuery({
     queryKey: ["scores"],
     queryFn: fetchScores,
   });
@@ -78,12 +82,17 @@ export function useGetScores() {
   return {
     scores,
     fetchScores: refetch,
+    isLoading,
   };
 }
 
 export function useGetPlayers() {
   const queryClient = useQueryClient();
-  const { data: players = [], refetch } = useQuery({
+  const {
+    data: players = [],
+    refetch,
+    isLoading,
+  } = useQuery({
     queryKey: ["players"],
     queryFn: fetchPlayers,
   });
@@ -91,6 +100,7 @@ export function useGetPlayers() {
   return {
     players,
     fetchPlayers: refetch,
+    isLoading,
   };
 }
 

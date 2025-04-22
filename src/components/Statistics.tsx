@@ -4,6 +4,8 @@ import { CourseAverages } from "./Statistics/CourseAverages";
 import { HandicapEvolution } from "./Statistics/HandicapEvolution";
 import React from "react";
 import { useMediaQuery } from "@mantine/hooks";
+import { useGetPlayers, useGetScores } from "../hooks";
+import { ChartSkeleton } from "./LoadingStates/ChartSkeleton";
 
 const PLAYER_COLORS = {
   Travis: "#FF6B6B", // Red
@@ -11,8 +13,16 @@ const PLAYER_COLORS = {
   JP: "#228BE6", // Light Blue
 };
 
-export const Statistics = ({ netSwitch }) => {
+interface StatisticsProps {
+  netSwitch: boolean;
+}
+
+export const Statistics: React.FC<StatisticsProps> = ({ netSwitch }) => {
   const isMobile = useMediaQuery("(max-width: 782px)");
+  const { isLoading: playersLoading } = useGetPlayers();
+  const { isLoading: scoresLoading } = useGetScores();
+
+  const isLoading = playersLoading || scoresLoading;
 
   return (
     <Stack gap="lg">
@@ -32,13 +42,21 @@ export const Statistics = ({ netSwitch }) => {
         <ScrollArea w="100vw" type="never">
           <Group justify="center" gap="lg" wrap="nowrap" px="lg">
             <Stack>
-              <ScoresChart netSwitch={netSwitch} />
+              {isLoading ? (
+                <ChartSkeleton />
+              ) : (
+                <ScoresChart netSwitch={netSwitch} />
+              )}
             </Stack>
             <Stack>
-              <CourseAverages netSwitch={netSwitch} />
+              {isLoading ? (
+                <ChartSkeleton />
+              ) : (
+                <CourseAverages netSwitch={netSwitch} />
+              )}
             </Stack>
             <Stack>
-              <HandicapEvolution />
+              {isLoading ? <ChartSkeleton /> : <HandicapEvolution />}
             </Stack>
           </Group>
         </ScrollArea>
@@ -47,13 +65,21 @@ export const Statistics = ({ netSwitch }) => {
           <ScrollArea w="80vw" type="never">
             <Group justify="center" gap="lg" wrap="nowrap" px="lg">
               <Stack>
-                <ScoresChart netSwitch={netSwitch} />
+                {isLoading ? (
+                  <ChartSkeleton />
+                ) : (
+                  <ScoresChart netSwitch={netSwitch} />
+                )}
               </Stack>
               <Stack>
-                <CourseAverages netSwitch={netSwitch} />
+                {isLoading ? (
+                  <ChartSkeleton />
+                ) : (
+                  <CourseAverages netSwitch={netSwitch} />
+                )}
               </Stack>
               <Stack>
-                <HandicapEvolution />
+                {isLoading ? <ChartSkeleton /> : <HandicapEvolution />}
               </Stack>
             </Group>
           </ScrollArea>

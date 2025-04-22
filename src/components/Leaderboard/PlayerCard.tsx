@@ -6,7 +6,7 @@ import {
   IconCircleNumber2Filled,
   IconCircleNumber3Filled,
 } from "@tabler/icons-react";
-import { useGetPlayers, useGetScores } from "../hooks";
+import { useGetPlayers, useGetScores } from "../../hooks";
 
 export const PlayerCard = ({ netSwitch }) => {
   const isMobile = useMediaQuery("(max-width: 782px)");

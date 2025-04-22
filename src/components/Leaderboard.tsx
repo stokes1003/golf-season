@@ -9,12 +9,26 @@ import {
 } from "@mantine/core";
 import React, { useState } from "react";
 import { useMediaQuery } from "@mantine/hooks";
-import { PlayerCard } from "./PlayerCard";
+import { PlayerCard } from "./Leaderboard/PlayerCard";
 import { IconInfoCircle } from "@tabler/icons-react";
+import { useGetPlayers, useGetScores } from "../hooks";
+import { CardSkeleton } from "./LoadingStates/CardSkeleton";
 
-export const Leaderboard = ({ netSwitch, setNetSwitch }) => {
+interface LeaderboardProps {
+  netSwitch: boolean;
+  setNetSwitch: (value: boolean) => void;
+}
+
+export const Leaderboard: React.FC<LeaderboardProps> = ({
+  netSwitch,
+  setNetSwitch,
+}) => {
   const [modalOpened, setModalOpened] = useState(false);
   const isMobile = useMediaQuery("(max-width: 782px)");
+  const { players, isLoading: playersLoading } = useGetPlayers();
+  const { scores, isLoading: scoresLoading } = useGetScores();
+
+  const isLoading = playersLoading || scoresLoading;
 
   return (
     <Stack gap="lg" justify="space-evenly">
@@ -88,13 +102,29 @@ export const Leaderboard = ({ netSwitch, setNetSwitch }) => {
           {isMobile ? (
             <ScrollArea w="100vw" type="never">
               <Group justify="center" gap="lg" wrap="nowrap" px="lg">
-                <PlayerCard netSwitch={netSwitch} />
+                {isLoading ? (
+                  <>
+                    <CardSkeleton />
+                    <CardSkeleton />
+                    <CardSkeleton />
+                  </>
+                ) : (
+                  <PlayerCard netSwitch={netSwitch} />
+                )}
               </Group>
             </ScrollArea>
           ) : (
             <Stack>
               <Group gap="lg" justify="center" align="end">
-                <PlayerCard netSwitch={netSwitch} />
+                {isLoading ? (
+                  <>
+                    <CardSkeleton />
+                    <CardSkeleton />
+                    <CardSkeleton />
+                  </>
+                ) : (
+                  <PlayerCard netSwitch={netSwitch} />
+                )}
               </Group>
             </Stack>
           )}
