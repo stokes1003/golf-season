@@ -75,7 +75,7 @@ export const AddScores = ({ setIsLeaderboard }) => {
       };
 
       // First, post the scores
-      await postScores(roundData);
+      await postScores.mutateAsync(roundData);
 
       // Then update player points
       await updatePlayerPoints({
@@ -83,8 +83,8 @@ export const AddScores = ({ setIsLeaderboard }) => {
         isMajor: roundData.isMajor,
       });
 
-      // Finally, refresh both scores and players data
-      await Promise.all([fetchScores(), fetchPlayers()]);
+      // Refresh players data only (scores will be refetched by cache invalidation)
+      await fetchPlayers();
 
       // Reset the form and return to leaderboard
       setCurrentPlayerIndex(0);

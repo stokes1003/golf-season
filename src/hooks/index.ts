@@ -105,8 +105,10 @@ export function useGetPlayers() {
 }
 
 export function usePostScores() {
-  const postScores = async (round: Round) => {
-    try {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async (round: Round) => {
       const response = await fetch("/.netlify/functions/addScores", {
         method: "POST",
         headers: {
@@ -114,22 +116,15 @@ export function usePostScores() {
         },
         body: JSON.stringify(round),
       });
-
       if (!response.ok) {
-        console.error("Error submitting scores:", response.statusText);
-        return;
+        throw new Error("Error submitting scores: " + response.statusText);
       }
-
-      const data = await response.json();
-      if (data) {
-        console.log("Scores submitted successfully:", data);
-      }
-    } catch (error) {
-      console.error("Error submitting scores:", error);
-    }
-  };
-
-  return postScores;
+      return response.json();
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["scores"] });
+    },
+  });
 }
 
 export function calculatePoints(
